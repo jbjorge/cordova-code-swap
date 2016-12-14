@@ -1,0 +1,22 @@
+{
+  "name": "cordova-code-swap",
+  "version": "1.0.0",
+  "description": "Allows fetching updates to js-part of app",
+  "main": "index.js",
+  "scripts": {
+    "test:ci": "nodemon --watch index.js --watch test.js --exec 'node test.js'",
+    "lint": "eslint index.js"
+  },
+  "keywords": [],
+  "author": "Joachim Bjørge <jb@ground.no> (http://ground.no)",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "superagent": "^3.2.1",
+    "superagent-bluebird-promise": "^4.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.12.1",
+    "nodemon": "^1.11.0"
+  }
+}
