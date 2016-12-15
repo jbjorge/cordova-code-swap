@@ -1,6 +1,6 @@
 function getCopyAndDownloadList(ccs, manifest) {
-	var filesToCopy = manifest.filter(fileEntry => hashExists(ccs, fileEntry));
-	var filesToDownload = manifest.filter(fileEntry => !hashExists(ccs, fileEntry));
+	var filesToCopy = manifest.filter(fileEntry => hashExists(ccs, fileEntry)).map(fileEntry => fileEntry.file);
+	var filesToDownload = manifest.filter(fileEntry => !hashExists(ccs, fileEntry)).map(fileEntry => fileEntry.file);
 	return { filesToCopy, filesToDownload };
 }
 
