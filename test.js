@@ -11,9 +11,19 @@ global.window = {
 };
 global.cordova = {
 	file: {
-		dataDirectory: 'dataDirectory'
+		dataDirectory: 'dataDirectory/'
 	}
 };
+global.FileTransfer = function(){
+	return {
+		download: function(url, destinationFolder, onSuccess, onError, trustAllHosts, options){
+			console.log(url, destinationFolder);
+			onSuccess({
+				toURL: function(){}
+			})
+		}
+	}
+}
 var lib = require('./index');
 
 lib.initialize()
