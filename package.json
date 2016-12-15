@@ -2,9 +2,15 @@
   "name": "cordova-code-swap",
   "version": "1.0.0",
   "description": "Allows fetching updates to js-part of app",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test:ci": "nodemon --watch index.js --watch test.js --exec 'node test.js'",
+    "build": "run-s build:clean build:js",
+    "build:js": "browserify index.js -o build/index.js -t [ babelify --presets [ es2015 ] ]",
+    "build:clean": "mkdir -p build && rm -r build/*",
+
+    "test": "node test.js",
+    "test:ci": "nodemon --exec 'node test.js'",
+
     "lint": "eslint index.js"
   },
   "keywords": [],
@@ -16,7 +22,11 @@
     "superagent-bluebird-promise": "^4.1.0"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.18.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.1",
     "eslint": "^3.12.1",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "npm-run-all": "^3.1.2"
   }
 }
