@@ -5,7 +5,8 @@ module.exports = {
         "es6": true,
     },
     "globals": {
-        "FileTransfer": true
+        "FileTransfer": true,
+        "cordova": true
     },
     "extends": "eslint:recommended",
     "rules": {
