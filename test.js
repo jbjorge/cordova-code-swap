@@ -20,11 +20,11 @@ global.FileTransfer = function(){
 			console.log(url, destinationFolder);
 			onSuccess({
 				toURL: function(){}
-			})
+			});
 		}
-	}
-}
-var lib = require('./index');
+	};
+};
+var lib = require('./src/index');
 
 lib.initialize()
 	.then(() => lib.lookForUpdates('https://live.zegeba.com/assets/app/chcp.json'))

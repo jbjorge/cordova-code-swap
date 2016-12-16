@@ -1,17 +1,18 @@
 var request = require('superagent-bluebird-promise');
 var Promise = require('bluebird');
-var fetchFiles = require('./src/fetchFiles');
-var getCopyAndDownloadList = require('./src/getCopyAndDownloadList');
-var compareWithCurrentVersion = require('./src/compareWithCurrentVersion');
-var getTextFromRequest = require('./src/getTextFromRequest');
-var ccs = localStorage.cordovaCodeSwap || {};
+var fetchFiles = require('./fetchFiles');
+var getCopyAndDownloadList = require('./getCopyAndDownloadList');
+var compareWithCurrentVersion = require('./compareWithCurrentVersion');
+var getTextFromRequest = require('./getTextFromRequest');
 var initialized = false;
+var	ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
 
 // test-data - remove before deploy
-var exampleData = require('./example-data');
+var exampleData = require('../example-data');
 ccs.manifest = exampleData.manifest;
 
 function initialize() {
+	console.log(ccs.entryPoint, window.location.href);
 	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
 		window.location.href = ccs.entryPoint;
 	}
@@ -21,6 +22,7 @@ function initialize() {
 
 function lookForUpdates(url, options) {
 	options = options || {};
+	options.entryPoint = options.entryPoint || 'index.html';
 	if (!initialized) {
 		return Promise.reject('Cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.');
 	}
@@ -43,8 +45,8 @@ function download(versionInfo, options) {
 
 function install(versionInfo, options) {
 	ccs.version = versionInfo.release;
-	ccs.entryPoint = cordova.file.dataDirectory + ccs.version + options.entryPoint || '/index.html';
-	localStorage.ccs = ccs;
+	ccs.entryPoint = cordova.file.dataDirectory + ccs.version + '/' + options.entryPoint;
+	localStorage.ccs = JSON.stringify(ccs);
 	window.location.href = ccs.entryPoint;
 }
 
