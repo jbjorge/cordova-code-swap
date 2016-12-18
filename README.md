@@ -1,5 +1,11 @@
 # Cordova code swap
-This library can be used to swap out code in a cordova application.
+This library is a drop-in-replacement for the client side of [cordova-hot-code-push](https://github.com/nordnet/cordova-hot-code-push) that avoids some of its limitations.
+
+## Differences from cordova-hot-code-push
+
+* Minimal API
+* API returns promises
+* Can update your app on first run
 
 ## Installation
 `npm install --save cordova-code-swap`
@@ -10,9 +16,10 @@ If the app is supposed to run on a different version than the code that came wit
 
 Now you are free to check for updates, download and install them.
 ```javascript
+var ccs = require('cordova-code-swap');
+
 document.addEventListener('deviceready', function(){
-	var ccs = require('cordova-code-swap');
-	ccs.initialize(); // <-- returns promise
+	ccs.initialize(); // <-- returns promise that always resolves
 	ccs.lookForUpdates(urlToUpdateFile, options)
 		.catch(err => {})
 		.then(download => download())
@@ -30,4 +37,4 @@ options = {
 ```
 
 ## Creating the necessary files for the update server
-TODO
+See [cordova-hot-code-push-cli](https://github.com/nordnet/cordova-hot-code-push-cli).
