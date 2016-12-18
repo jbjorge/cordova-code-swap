@@ -24,7 +24,7 @@ function createDirectory(fs, folders) {
 			() => resolve(),
 			err => {
 				if (err.code != 12) {
-					reject(new Error(JSON.stringify(err)));
+					reject(new Error('cordova-code-swap: ' + JSON.stringify(err)));
 				} else {
 					resolve();
 				}

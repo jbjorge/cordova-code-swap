@@ -1,6 +1,6 @@
 function compareWithCurrentVersion(ccs, versionInfo) {
 	if (versionInfo.release === ccs.version)
-		throw { code: 1, message: 'No new updates found' };
+		throw new Error('cordova-code-swap: ' + 'No new updates found');
 	return versionInfo;
 }
 

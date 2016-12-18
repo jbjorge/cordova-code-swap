@@ -6,7 +6,7 @@ function getFolder(fs, path, options) {
 			path,
 			options,
 			resolve,
-			err => reject(new Error(JSON.stringify(err)))
+			err => reject(new Error('cordova-code-swap: ' + JSON.stringify(err)))
 		);
 	});
 }

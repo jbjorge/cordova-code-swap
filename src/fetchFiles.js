@@ -1,7 +1,7 @@
 var downloadFiles = require('./downloadFiles');
 var copyFolder = require('./copyFolder');
 var createFoldersInPath = require('./createFoldersInPath');
-var copyFiles = require('./copyFilesRev');
+var copyFiles = require('./copyFiles');
 
 function fetchFiles(ccs, { filesToCopy, filesToDownload }, versionInfo, options) {
 	var contentUrl = versionInfo.content_url;
@@ -14,7 +14,6 @@ function fetchFiles(ccs, { filesToCopy, filesToDownload }, versionInfo, options)
 		.then(() => copyFiles(dataDir, filesToCopy.map(file => srcFolderName + '/' + file), dataDir, destinationFolderName))
 		.catch(() => downloadFiles(contentUrl, filesToCopy, destinationFolderName, options))
 		.then(() => downloadFiles(contentUrl, filesToDownload, destinationFolderName, options))
-		// .then(() => downloadFiles(applicationDir + 'www/', ['cordova.js', 'cordova_plugins.js'], destinationFolderName, options))
 		.then(() => copyFiles(applicationDir, ['www/cordova.js', 'www/cordova_plugins.js'], dataDir, destinationFolderName))
 		.then(() => copyFolder(applicationDir, 'www/cordova-js-src/', dataDir, destinationFolderName))
 		.then(() => copyFolder(applicationDir, 'www/plugins/', dataDir, destinationFolderName));

@@ -20,17 +20,8 @@ function downloadFile(contentUrl, fileToDownload, destinationFolderName, options
 				fileTransfer.download(
 					uri,
 					destinationPath,
-					function(entry) {
-						console.log("download complete: " + entry.toURL());
-						resolve(entry);
-					},
-					function(error) {
-						debugger;
-						console.log("download error source " + error.source);
-						console.log("download error target " + error.target);
-						console.log("download error code" + error.code);
-						reject(error);
-					},
+					resolve,
+					error => reject(new Error('cordova-code-swap: ' + JSON.stringify(error))),
 					shouldTrustAllHosts,
 					options
 				);
