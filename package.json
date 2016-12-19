@@ -1,8 +1,12 @@
 {
   "name": "cordova-code-swap",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Allows fetching updates to js-part of app",
   "main": "build/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jbjorge/cordova-code-swap.git"
+  },
   "scripts": {
     "build": "run-s build:clean build:js",
     "build:js": "babel src --out-dir build --plugins transform-object-assign --presets=es2015",
