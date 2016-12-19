@@ -15,6 +15,10 @@ function getCopyAndDownloadList(ccs, manifest) {
 }
 
 function hashExists(ccs, fileEntry) {
+	if (!ccs || !ccs.manifest || !ccs.manifest.length) {
+		return false;
+	}
+
 	for (var i = 0; i < ccs.manifest.length; i++) {
 		if (ccs.manifest[i].hash === fileEntry.hash) return true;
 	}
