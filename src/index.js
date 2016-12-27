@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 var fetchFiles = require('./fetchFiles');
 var getCopyAndDownloadList = require('./getCopyAndDownloadList');
 var compareWithCurrentVersion = require('./compareWithCurrentVersion');
-var getTextFromRequest = require('./getTextFromRequest');
+var parseResponseToObject = require('./parseResponseToObject');
 var initialized = false;
 var ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
 var defaultOptions = {
@@ -28,7 +28,7 @@ function lookForUpdates(url, options) {
 	}
 
 	return request.get(url, { headers: options.headers })
-		.then(getTextFromRequest)
+		.then(parseResponseToObject)
 		.then(updateInfo => compareWithCurrentVersion(ccs, updateInfo))
 		.then(updateInfo => {
 			var downloadFunction = _download.bind(null, updateInfo, options);
@@ -41,7 +41,7 @@ function _download(updateInfo, options, progressCallback) {
 	var contentUrl = updateInfo.content_url;
 	var manifestUrl = contentUrl + 'chcp.manifest';
 	return request.get(manifestUrl, { headers: options.headers })
-		.then(getTextFromRequest)
+		.then(parseResponseToObject)
 		.then(manifest => getCopyAndDownloadList(ccs, manifest))
 		.then(fetchList => fetchFiles(ccs, fetchList, updateInfo, options, progressCallback))
 		.then(() => {
