@@ -5,7 +5,7 @@ var getCopyAndDownloadList = require('./getCopyAndDownloadList');
 var compareWithCurrentVersion = require('./compareWithCurrentVersion');
 var getTextFromRequest = require('./getTextFromRequest');
 var initialized = false;
-var	ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
+var ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
 var defaultOptions = {
 	entryFile: 'index.html',
 	headers: {
@@ -31,26 +31,50 @@ function lookForUpdates(url, options) {
 		.then(getTextFromRequest)
 		.then(updateInfo => compareWithCurrentVersion(ccs, updateInfo))
 		.then(updateInfo => {
-			var downloadFunction = download.bind(null, updateInfo, options);
+			var downloadFunction = _download.bind(null, updateInfo, options);
+			downloadFunction.updateInfo = updateInfo;
 			return downloadFunction;
 		});
 }
 
-function download(updateInfo, options, progressCallback) {
+function _download(updateInfo, options, progressCallback) {
 	var contentUrl = updateInfo.content_url;
 	var manifestUrl = contentUrl + 'chcp.manifest';
 	return request.get(manifestUrl, { headers: options.headers })
 		.then(getTextFromRequest)
 		.then(manifest => getCopyAndDownloadList(ccs, manifest))
 		.then(fetchList => fetchFiles(ccs, fetchList, updateInfo, options, progressCallback))
-		.then(() => install.bind(null, updateInfo, options));
+		.then(() => {
+			ccs.pendingInstallation = {};
+			ccs.pendingInstallation.updateInfo = updateInfo;
+			ccs.pendingInstallation.options = options;
+			localStorage.ccs = JSON.stringify(ccs);
+		})
+		.then(() => {
+			return _install.bind(null, updateInfo, options);
+		})
+		.catch(err => {
+			ccs.pendingInstallation = false;
+			localStorage.ccs = JSON.stringify(ccs);
+			throw err;
+		});
 }
 
-function install(updateInfo, options) {
+function _install(updateInfo, options) {
+	ccs.pendingInstallation = false;
 	ccs.version = updateInfo.release;
 	ccs.entryPoint = cordova.file.dataDirectory + ccs.version + '/' + options.entryFile;
 	localStorage.ccs = JSON.stringify(ccs);
 	window.location.href = ccs.entryPoint;
+	return Promise.resolve();
 }
 
-module.exports = { initialize, lookForUpdates };
+function install() {
+	if (ccs.pendingInstallation) {
+		return _install(ccs.pendingInstallation.updateInfo, ccs.pendingInstallation.options);
+	} else {
+		return Promise.reject(new Error('cordova-code-swap: Tried to install update, but no updates have been previously downloaded.'));
+	}
+}
+
+module.exports = { initialize, lookForUpdates, install };
