@@ -3,7 +3,7 @@ var createFoldersInPath = require('./createFoldersInPath');
 function downloadFiles(contentUrl, filesToDownload, destinationFolderName, options) {
 	var downloadPromises = [];
 	filesToDownload.forEach(fileToDownload => {
-		downloadPromises.push(downloadFile(contentUrl, fileToDownload, destinationFolderName, options));
+		downloadPromises.push(downloadFile(contentUrl, fileToDownload, destinationFolderName, { headers: options.headers }));
 	});
 	return Promise.all(downloadPromises);
 }

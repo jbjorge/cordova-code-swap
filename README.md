@@ -11,7 +11,7 @@ This library is a drop-in-replacement for the client side of [cordova-hot-code-p
 `npm install --save cordova-code-swap`
 
 ## Usage
-Call `ccs.initialize()` as the first thing after `deviceready` has fired.
+Call `.initialize()` as the first thing after `deviceready` has fired.
 If the app is supposed to run on a different version than the code that came with your native installation, it will then switch to that version immediately after `.initialize()` has been called.
 
 Now you are free to check for updates, download and install them.
@@ -32,7 +32,13 @@ document.addEventListener('deviceready', function(){
 ## Options
 ```
 options = {
-	entryFile: 'index.html', // path to your .html file, relative to the www-folder. Default is index.html
+	// path to your .html file, relative to the www-folder. Default is index.html
+	entryFile: 'index.html',
+
+	// headers that will be sent with the requests to the update server
+	headers: {
+		key: value
+	}
 }
 ```
 
