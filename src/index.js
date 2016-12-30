@@ -6,6 +6,7 @@ const compareWithCurrentVersion = require('./compareWithCurrentVersion');
 const parseResponseToObject = require('./parseResponseToObject');
 const urlJoin = require('url-join');
 const sanitizeFolder = require('filenamify');
+const getContentUrl = require('./getContentUrl');
 var initialized = false;
 const ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
 const defaultOptions = {
@@ -32,20 +33,23 @@ function initialize() {
 /**
  * PUBLIC
  * Looks for updates on the server
- * @param  {String} url     Url to the chcp.json file on the server
+ * @param  {String} url     Url to the update server
  * @param  {Object} options Options to use when communicating with the server. See https://www.npmjs.com/package/request
  * @return {Promise}		Resolves with download function, rejects with error.
  */
 function lookForUpdates(url, options = {}) {
-	options = Object.assign({}, defaultOptions, options);
 	if (!initialized) {
 		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
 	}
 
-	return request.get(url, { headers: options.headers })
+	options = Object.assign({}, defaultOptions, options);
+	const updateDeclaration = urlJoin(url, 'chcp.json');
+
+	return request.get(updateDeclaration, { headers: options.headers })
 		.then(parseResponseToObject)
 		.then(updateInfo => compareWithCurrentVersion(ccs, updateInfo))
 		.then(updateInfo => {
+			updateInfo.content_url = getContentUrl(url, updateInfo);
 			var downloadFunction = _download.bind(null, updateInfo, options);
 			downloadFunction.updateInfo = updateInfo;
 			return downloadFunction;

@@ -6,6 +6,7 @@ This library is a drop-in-replacement for the client side of [cordova-hot-code-p
 * Minimal API
 * API returns promises
 * Can update your app on first run
+* Supports relative content_url path in chcp.json
 
 ## Installation
 `npm install --save cordova-code-swap`
@@ -16,7 +17,7 @@ See [cordova-hot-code-push-cli](https://github.com/nordnet/cordova-hot-code-push
 ## Usage
 ```javascript
 var ccs = require('cordova-code-swap');
-var urlToUpdateFile = 'https://example.com/my-app/chcp.json';
+var urlToUpdateEndpoint = 'https://example.com/my-app/';
 var options = {
 	entryFile: 'app.html',
 	headers: {
@@ -26,7 +27,7 @@ var options = {
 
 document.addEventListener('deviceready', function(){
 	ccs.initialize() // must always be run before anything else
-	ccs.lookForUpdates(urlToUpdateFile, options)
+	ccs.lookForUpdates(urlToUpdateEndpoint, options)
 		.catch(err => {})
 		.then(download => download())
 		.catch(downloadErr => {})
@@ -73,7 +74,7 @@ The `download` function has the property `.updateInfo` tacked on. This contains 
 The `download.updateInfo` object can e.g. look like this:
 ```JSON
 {
-	"content_url": "https://example.com/my-app-name/",
+	"content_url": "https://example.com/my-app-name/", (or "content_url": "/relative/to/chcp.json")
 	"release": "1.3.3",
 	"installTime": "afterRestart"
 }
