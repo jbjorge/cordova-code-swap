@@ -1,7 +1,15 @@
-var getFileSystem = require('./getFileSystem');
-var getFolder = require('./getFolder');
-var Promise = require('bluebird');
+const getFileSystem = require('./getFileSystem');
+const getFolder = require('./getFolder');
+const Promise = require('bluebird');
 
+/**
+ * Copy folder to folder
+ * @param  {String} fromRoot       Root from-folder to resolve
+ * @param  {String} fromFolderPath Path to source folder relative to fromRoot
+ * @param  {String} toRoot         Root to-folder to resolve
+ * @param  {String} toFolderPath   Path to destination folder relative to toRoot
+ * @return {Promise}
+ */
 function copyFolder(fromRoot, fromFolderPath, toRoot, toFolderPath) {
 	return Promise.join(
 		getFolderEntry(fromRoot, fromFolderPath),

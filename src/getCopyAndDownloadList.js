@@ -1,3 +1,9 @@
+/**
+ * Determines which files can be copied and which must be downloaded
+ * @param  {Object} ccs      The ccs info stored in localstorage
+ * @param  {Object} manifest File manifest received from the server
+ * @return {Object}          {filesToCopy[String], filesToDownload[String]}
+ */
 function getCopyAndDownloadList(ccs, manifest) {
 	var filesToCopy = manifest.filter(fileEntry => hashExists(ccs, fileEntry)).map(fileEntry => fileEntry.file);
 	var filesToDownload = manifest.filter(fileEntry => !hashExists(ccs, fileEntry)).map(fileEntry => fileEntry.file);

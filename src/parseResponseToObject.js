@@ -1,5 +1,5 @@
-function parseResponseToObject(request) {
-	return JSON.parse(request);
+function parseResponseToObject(response) {
+	return JSON.parse(response);
 }
 
 module.exports = parseResponseToObject;

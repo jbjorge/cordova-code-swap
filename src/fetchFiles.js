@@ -1,17 +1,28 @@
-var downloadFiles = require('./downloadFiles');
-var copyFolder = require('./copyFolder');
-var createFoldersInPath = require('./createFoldersInPath');
-var copyFiles = require('./copyFiles');
+const downloadFiles = require('./downloadFiles');
+const copyFolder = require('./copyFolder');
+const createFoldersInPath = require('./createFoldersInPath');
+const copyFiles = require('./copyFiles');
+const urlJoin = require('url-join');
+const sanitizeFolder = require('filenamify');
 
+/**
+ * Fetches the update files. Tries to copy from current version first if hashes match, reverts to downloading if that fails.
+ * @param  {Object} ccs                     The ccs info stored in localstorage
+ * @param  {Array[String]} filesToCopy 		Files to be copied
+ * @param  {Array[String]} filesToDownload 	Files to be downloaded
+ * @param  {Object} versionInfo             The info received from the server
+ * @param  {Object} options                 See calling function
+ * @return {Promise}
+ */
 function fetchFiles(ccs, { filesToCopy, filesToDownload }, versionInfo, options) {
-	var contentUrl = versionInfo.content_url;
-	var srcFolderName = ccs.version;
-	var destinationFolderName = versionInfo.release;
-	var dataDir = cordova.file.dataDirectory;
-	var applicationDir = cordova.file.applicationDirectory;
+	const contentUrl = versionInfo.content_url;
+	const srcFolderName = ccs.version;
+	const destinationFolderName = sanitizeFolder(versionInfo.release);
+	const dataDir = cordova.file.dataDirectory;
+	const applicationDir = cordova.file.applicationDirectory;
 
 	return createFoldersInPath(destinationFolderName)
-		.then(() => copyFiles(dataDir, filesToCopy.map(file => srcFolderName + '/' + file), dataDir, destinationFolderName))
+		.then(() => copyFiles(dataDir, filesToCopy.map(file => urlJoin(srcFolderName, file)), dataDir, destinationFolderName))
 		.catch(() => downloadFiles(contentUrl, filesToCopy, destinationFolderName, options))
 		.then(() => downloadFiles(contentUrl, filesToDownload, destinationFolderName, options))
 		.then(() => copyFiles(applicationDir, ['www/cordova.js', 'www/cordova_plugins.js'], dataDir, destinationFolderName))

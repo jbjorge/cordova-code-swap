@@ -1,14 +1,22 @@
-var getFileSystem = require('./getFileSystem');
-var getFolder = require('./getFolder');
-var getFile = require('./getFile');
-var Promise = require('bluebird');
+const getFileSystem = require('./getFileSystem');
+const getFolder = require('./getFolder');
+const getFile = require('./getFile');
+const Promise = require('bluebird');
 
+/**
+ * Copies files between locations
+ * @param  {String} 		fromRootFolder The folder to be copied from
+ * @param  {Array[String]} 	files          Array of paths to files relative to fromRootFolder
+ * @param  {String} 		toRootFolder   The root folder of the copy destination
+ * @param  {String} 		toFolder       The folder to create and use as destination for files
+ * @return {Promise}
+ */
 function copyFiles(fromRootFolder, files, toRootFolder, toFolder) {
 	return Promise.join(
 		getFileEntries(fromRootFolder, files),
 		getToFolderEntry(toRootFolder, toFolder),
 		(fileEntries, toFolderEntry) => {
-			var copyPromises = [];
+			const copyPromises = [];
 			fileEntries.forEach(fileEntry => {
 				copyPromises.push(copyFile(fileEntry, toFolderEntry));
 			});
@@ -24,7 +32,7 @@ function getToFolderEntry(toRootFolder, toFolder) {
 function getFileEntries(fromRootFolder, files) {
 	return getFileSystem(fromRootFolder)
 		.then(fs => {
-			var filePromises = files.map(file => getFile(fs, file, { create: false }));
+			const filePromises = files.map(file => getFile(fs, file, { create: false }));
 			return Promise.all(filePromises);
 		});
 }
