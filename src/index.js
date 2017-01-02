@@ -1,4 +1,4 @@
-const request = require('request-promise');
+const request = require('./request');
 const Promise = require('bluebird');
 const fetchFiles = require('./fetchFiles');
 const getCopyAndDownloadList = require('./getCopyAndDownloadList');
