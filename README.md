@@ -1,24 +1,36 @@
 # Cordova code swap
+
 This library is a drop-in-replacement for the client side of [cordova-hot-code-push](https://github.com/nordnet/cordova-hot-code-push) that avoids some of its limitations.
 
 ## Differences from cordova-hot-code-push
 
-* Minimal API
-* API returns promises
-* Can update your app on first run
-* Supports relative content_url path in chcp.json
+- Minimal API
+- API returns promises
+- Can update your app on first run
+- Supports relative content_url path in chcp.json
 
 ## Installation
+
 `npm install --save cordova-code-swap`
 
 ## Creating the necessary files for the update server
+
 See [cordova-hot-code-push-cli](https://github.com/nordnet/cordova-hot-code-push-cli).
 
+### When using min_native_interface in chcp.json
+
+To let this library check what the version code of the app is, add `cordova-plugin-app-version` to your config.xml by running
+
+`cordova plugin add cordova-plugin-app-version@0.1.9`
+
+min_native_version is not respected by this library if the plugin is not installed.
+
 ## Usage
+
 ```javascript
 var ccs = require('cordova-code-swap');
 var urlToUpdateEndpoint = 'https://example.com/my-app/';
-var options = {
+var updateOptions = {
 	entryFile: 'app.html',
 	headers: {
 		'User-Agent': 'Cordova-Code-Swap'
@@ -27,7 +39,7 @@ var options = {
 
 document.addEventListener('deviceready', function(){
 	ccs.initialize() // must always be run before anything else
-	ccs.lookForUpdates(urlToUpdateEndpoint, options)
+	ccs.lookForUpdates(urlToUpdateEndpoint, updateOptions)
 		.catch(err => {})
 		.then(download => download())
 		.catch(downloadErr => {})
@@ -40,8 +52,9 @@ document.addEventListener('deviceready', function(){
 ```
 
 ## Options
-```
-options = {
+
+```javascript
+var updateOptions = {
 	// path to your .html file, relative to the www-folder. Default is index.html
 	entryFile: 'index.html',
 
@@ -53,6 +66,7 @@ options = {
 ```
 
 ## API
+
 `ccs.initialize()`
 Returns a promise that always resolves.
 Must be run before anything else!
@@ -72,9 +86,10 @@ If it finished downloading without errors, the promise is resolved with an `inst
 The `download` function can be called when you want to download the updated files.
 The `download` function has the property `.updateInfo` tacked on. This contains the JSON-object it received from the server when looking for updates and can be used to better determine if you want to call `download()` or not.
 The `download.updateInfo` object can e.g. look like this:
-```JSON
+
+```javascript
 {
-	"content_url": "https://example.com/my-app-name/", (or "content_url": "/relative/to/chcp.json")
+	"content_url": "https://example.com/my-app-name/", //(or "content_url": "/relative/to/chcp.json")
 	"release": "1.3.3",
 	"installTime": "afterRestart"
 }
