@@ -3,7 +3,8 @@ const Promise = require('bluebird');
 function get(url, headers = {}) {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
-		xhr.open('GET', url, true);
+		const nonCachingUrl = url + '?_=' + new Date().getTime();
+		xhr.open('GET', nonCachingUrl, true);
 		
 		for (let headerName in headers) {
 			xhr.setRequestHeader(headerName, headers[headerName]);
@@ -14,12 +15,12 @@ function get(url, headers = {}) {
 				if (xhr.status === 200) {
 					resolve(xhr.responseText);
 				} else {
-					reject(xhr.statusText);
+					reject(new Error(`cordova-code-swap: Failed when fetching ${url}. The server responded with "${xhr.statusText}".`));
 				}
 			}
 		};
 		xhr.onerror = function() {
-			reject(xhr.statusText);
+			reject(new Error(`cordova-code-swap: Failed when fetching ${url}. The server responded with "${xhr.statusText}".`));
 		};
 		xhr.send(null);
 	});

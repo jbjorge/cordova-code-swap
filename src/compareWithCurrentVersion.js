@@ -31,14 +31,14 @@ function throwIfNativeVersionTooOld(ccs, updateInfo) {
 }
 
 function getNativeVersion(ccs, updateInfo) {
-	return new Promise((resolve, reject) => {
+	return new Promise((resolve) => {
 		if (usingPlugin())
 			cordova.getAppVersion.getVersionCode(resolve);
 		else if (ccs.currentNativeVersion)
 			resolve(ccs.currentNativeVersion);
 		else
 			resolve(updateInfo.min_native_interface);
-	})
+	});
 }
 
 function usingPlugin() {

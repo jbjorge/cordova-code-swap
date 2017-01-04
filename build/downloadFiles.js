@@ -23,7 +23,7 @@ function downloadFile(contentUrl, fileToDownload, destinationFolderName, options
 	return createFoldersInPath(urlJoin(destinationFolderName, fileToDownload), { endsInFile: true }).then(function () {
 		return new Promise(function (resolve, reject) {
 			var fileTransfer = new FileTransfer();
-			var uri = urlJoin(contentUrl, fileToDownload);
+			var uri = encodeURI(urlJoin(contentUrl, fileToDownload));
 			var destinationPath = cordova.file.dataDirectory + destinationFolderName + '/' + fileToDownload;
 			var shouldTrustAllHosts = false;
 

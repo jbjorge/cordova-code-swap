@@ -7,7 +7,8 @@ function get(url) {
 
 	return new Promise(function (resolve, reject) {
 		var xhr = new XMLHttpRequest();
-		xhr.open('GET', url, true);
+		var nonCachingUrl = url + '?_=' + new Date().getTime();
+		xhr.open('GET', nonCachingUrl, true);
 
 		for (var headerName in headers) {
 			xhr.setRequestHeader(headerName, headers[headerName]);
@@ -18,12 +19,12 @@ function get(url) {
 				if (xhr.status === 200) {
 					resolve(xhr.responseText);
 				} else {
-					reject(xhr.statusText);
+					reject(new Error('cordova-code-swap: Failed when fetching ' + url + '. The server responded with "' + xhr.statusText + '".'));
 				}
 			}
 		};
 		xhr.onerror = function () {
-			reject(xhr.statusText);
+			reject(new Error('cordova-code-swap: Failed when fetching ' + url + '. The server responded with "' + xhr.statusText + '".'));
 		};
 		xhr.send(null);
 	});
