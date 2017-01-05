@@ -1,22 +1,25 @@
 /**
  * Determines which files can be copied and which must be downloaded
- * @param  {Object} ccs      The ccs info stored in localstorage
- * @param  {Object} manifest File manifest received from the server
- * @return {Object}          {filesToCopy[String], filesToDownload[String]}
+ * by searching the current manifest for matches
+ * @param  {Object} currentManifest		File manifest currently in use
+ * @param  {Object} newManifest 		File manifest received from the server
+ * @return {Object} {filesToCopy[String], filesToDownload[String]}
  */
-function getCopyAndDownloadList(ccs, manifest) {
-	var filesToCopy = manifest.filter(fileEntry => hashExists(ccs, fileEntry)).map(fileEntry => fileEntry.file);
-	var filesToDownload = manifest.filter(fileEntry => !hashExists(ccs, fileEntry)).map(fileEntry => fileEntry.file);
+function getCopyAndDownloadList(currentManifest, newManifest) {
+	var filesToCopy = newManifest
+		.filter(fileEntry => hashExists(currentManifest, fileEntry))
+		.map(fileEntry => fileEntry.file);
+
+	var filesToDownload = newManifest
+		.filter(fileEntry => !hashExists(currentManifest, fileEntry))
+		.map(fileEntry => fileEntry.file);
+
 	return { filesToCopy, filesToDownload };
 }
 
-function hashExists(ccs, fileEntry) {
-	if (!ccs || !ccs.manifest || !ccs.manifest.length) {
-		return false;
-	}
-
-	for (var i = 0; i < ccs.manifest.length; i++) {
-		if (ccs.manifest[i].hash === fileEntry.hash)
+function hashExists(manifest = [], fileEntry) {
+	for (var i = 0; i < manifest.length; i++) {
+		if (manifest[i].hash === fileEntry.hash)
 			return true;
 	}
 	return false;
