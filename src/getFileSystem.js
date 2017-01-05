@@ -10,7 +10,7 @@ function getFileSystem(folder) {
 		window.resolveLocalFileSystemURL(
 			folder,
 			resolve,
-			err => reject(new Error('cordova-code-swap: ' + JSON.stringify(err))));
+			err => reject(new Error('cordova-code-swap: Error when getting file system at path ' + folder + ' Error: ' + JSON.stringify(err))));
 	});
 }
 

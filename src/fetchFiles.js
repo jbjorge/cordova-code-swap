@@ -1,9 +1,8 @@
 const downloadFiles = require('./downloadFiles');
-const copyFolder = require('./copyFolder');
 const createFoldersInPath = require('./createFoldersInPath');
-const copyFiles = require('./copyFiles');
-const urlJoin = require('url-join');
 const sanitizeFolder = require('filenamify');
+const copyExistingFiles = require('./copyExistingFiles');
+const copyCordovaFiles = require('./copyCordovaFiles');
 
 /**
  * Fetches the update files. Tries to copy from current version first if hashes match, reverts to downloading if that fails.
@@ -16,18 +15,14 @@ const sanitizeFolder = require('filenamify');
  */
 function fetchFiles(ccs, { filesToCopy, filesToDownload }, versionInfo, options) {
 	const contentUrl = versionInfo.content_url;
-	const srcFolderName = ccs.version;
 	const destinationFolderName = sanitizeFolder(versionInfo.release);
 	const dataDir = cordova.file.dataDirectory;
-	const applicationDir = cordova.file.applicationDirectory;
 
 	return createFoldersInPath(destinationFolderName)
-		.then(() => copyFiles(dataDir, filesToCopy.map(file => urlJoin(srcFolderName, file)), dataDir, destinationFolderName))
+		.then(() => copyExistingFiles(ccs, dataDir, filesToCopy, destinationFolderName))
 		.catch(() => downloadFiles(contentUrl, filesToCopy, destinationFolderName, options))
 		.then(() => downloadFiles(contentUrl, filesToDownload, destinationFolderName, options))
-		.then(() => copyFiles(applicationDir, ['www/cordova.js', 'www/cordova_plugins.js'], dataDir, destinationFolderName))
-		.then(() => copyFolder(applicationDir, 'www/cordova-js-src/', dataDir, destinationFolderName))
-		.then(() => copyFolder(applicationDir, 'www/plugins/', dataDir, destinationFolderName));
+		.then(() => copyCordovaFiles(dataDir, destinationFolderName));
 }
 
 module.exports = fetchFiles;

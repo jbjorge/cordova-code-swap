@@ -13,7 +13,7 @@ function getFolder(fs, path, options) {
 			path,
 			options,
 			resolve,
-			err => reject(new Error('cordova-code-swap: ' + JSON.stringify(err)))
+			err => reject(new Error('cordova-code-swap: Error when getting folder at path ' + path + ' Error: ' + JSON.stringify(err)))
 		);
 	});
 }

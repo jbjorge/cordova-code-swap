@@ -9,13 +9,20 @@ const Promise = require('bluebird');
 function compareWithCurrentVersion(ccs, updateInfo) {
 	return Promise.resolve()
 		.then(() => throwIfCurrentVersionIsNewest(ccs, updateInfo))
+		.then(() => throwIfPendingInstallVersionIsSame(ccs, updateInfo))
 		.then(() => throwIfNativeVersionTooOld(ccs, updateInfo))
 		.then(() => updateInfo);
 }
 
 function throwIfCurrentVersionIsNewest(ccs, updateInfo) {
 	if (updateInfo.release === ccs.version) {
-		throw new Error('cordova-code-swap: ' + 'Current installed version is the same as the version on the update server.');
+		throw new Error('cordova-code-swap: Current installed version is the same as the version on the update server.');
+	}
+}
+
+function throwIfPendingInstallVersionIsSame(ccs, updateInfo) {
+	if (ccs.pendingInstallation && ccs.pendingInstallation.updateInfo && ccs.pendingInstallation.updateInfo.release === updateInfo.release) {
+		throw new Error('cordova-code-swap: Newest version is already downloaded, but not installed. Use .install() to install it.');
 	}
 }
 
@@ -26,7 +33,7 @@ function throwIfNativeVersionTooOld(ccs, updateInfo) {
 	return getNativeVersion(ccs, updateInfo)
 		.then(nativeVersion => {
 			if (nativeVersion < updateInfo.min_native_interface)
-				throw new Error('cordova-code-swap: ' + 'Native app version is too old to receive this update (min_native_interface is lower)');
+				throw new Error('cordova-code-swap: Native app version is too old to receive this update (min_native_interface is lower)');
 		});
 }
 

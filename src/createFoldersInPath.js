@@ -1,11 +1,12 @@
 const Promise = require('bluebird');
 const getFileSystem = require('./getFileSystem');
+const getFolder = require('./getFolder');
 
 /**
  * Loops over all folders in a path and creates them
  * @param  {string} path    the path to be created
  * @param  {Object} options optional - set .endsInFile to true if path ends in filename
- * @return {Promise}
+ * @return {Promise}		resolves with the final cordova folder
  */
 function createFoldersInPath(path, options = {}) {
 	const folders = path.split('/');
@@ -16,33 +17,15 @@ function createFoldersInPath(path, options = {}) {
 				if (i == folders.length-1 && options.endsInFile) {
 					continue;
 				}
-				const currentPath = folders.slice(0, i + 1);
-				dirCreationPromises = dirCreationPromises.then(() => createDirectory(fs, currentPath));
+				const currentPath = folders.slice(0, i + 1).join('/');
+				dirCreationPromises = dirCreationPromises
+					// tries to create the folder
+					.then(() => getFolder(fs, currentPath, { create: true }))
+					// tries to get the folder instead if creating failed because it already exists
+					.catch(() => getFolder(fs, currentPath, { create: false }));
 			}
 			return dirCreationPromises;
 		});
-}
-
-/**
- * Creates a folder
- * @param  {Object} fs      An instance of the cordova file system
- * @param  {Array}  folders Array of folder names
- * @return {Promise}
- */
-function createDirectory(fs, folders) {
-	return new Promise((resolve, reject) => {
-		fs.getDirectory(folders.join('/'),
-			{ create: true },
-			() => resolve(),
-			err => {
-				if (err.code != 12) {
-					reject(new Error('cordova-code-swap: ' + JSON.stringify(err)));
-				} else {
-					resolve();
-				}
-			}
-		);
-	});
 }
 
 module.exports = createFoldersInPath;
