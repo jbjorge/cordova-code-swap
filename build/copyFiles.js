@@ -4,6 +4,8 @@ var getFileSystem = require('./getFileSystem');
 var getFolder = require('./getFolder');
 var getFile = require('./getFile');
 var Promise = require('bluebird');
+var createFoldersInPath = require('./createFoldersInPath');
+var urlJoin = require('url-join');
 
 /**
  * Copies files between locations
@@ -14,38 +16,65 @@ var Promise = require('bluebird');
  * @return {Promise}
  */
 function copyFiles(fromRootFolder, files, toRootFolder, toFolder) {
-	return Promise.join(getFileEntries(fromRootFolder, files), getToFolderEntry(toRootFolder, toFolder), function (fileEntries, toFolderEntry) {
+	// return Promise.join(
+	// 	getFileEntries(fromRootFolder, files),
+	// 	getFolderEntry(toRootFolder, toFolder),
+	// 	(fileEntries, toFolderEntry) => {
+	// 		const copyPromises = [];
+	// 		fileEntries.forEach(fileEntry => {
+	// 			copyPromises.push(copyFile(fileEntry, toFolderEntry));
+	// 		});
+	// 		return Promise.all(copyPromises);
+	// 	});
+	return Promise.join(getFileSystem(fromRootFolder), getFolderEntry(toRootFolder, toFolder), function (fromFolderEntry, toFolderEntry) {
 		var copyPromises = [];
-		fileEntries.forEach(function (fileEntry) {
-			copyPromises.push(copyFile(fileEntry, toFolderEntry));
+		files.forEach(function (file) {
+			copyPromises.push(copyFile(fromFolderEntry, file, toFolderEntry));
 		});
 		return Promise.all(copyPromises);
 	});
 }
 
-function getToFolderEntry(toRootFolder, toFolder) {
-	return getFileSystem(toRootFolder).then(function (fs) {
-		return getFolder(fs, toFolder, { create: true });
+function getFolderEntry(rootFolder, subFolder) {
+	return getFileSystem(rootFolder).then(function (fs) {
+		return getFolder(fs, subFolder, { create: true });
 	});
 }
 
-function getFileEntries(fromRootFolder, files) {
-	return getFileSystem(fromRootFolder).then(function (fs) {
-		var filePromises = files.map(function (file) {
-			return getFile(fs, file, { create: false });
+// function getFileEntries(fromRootFolder, files) {
+// 	return getFileSystem(fromRootFolder)
+// 		.then(fs => {
+// 			const filePromises = files.map(file => getFile(fs, file, { create: false }));
+// 			return Promise.all(filePromises);
+// 		});
+// }
+
+function copyFile(fromFolderEntry, file, toFolderEntry) {
+	var fullPath = urlJoin(toFolderEntry.fullPath, file);
+	return Promise.join(getFile(fromFolderEntry, file, { create: false }), createFoldersInPath(fullPath, { endsInFile: true }), function (fileEntry, destinationEntry) {
+		return new Promise(function (resolve, reject) {
+			fileEntry.copyTo(destinationEntry, '', function () {
+				return resolve();
+			}, function (err) {
+				return reject(new Error('cordova-code-swap: ' + JSON.stringify(err)));
+			});
 		});
-		return Promise.all(filePromises);
 	});
 }
 
-function copyFile(fileEntry, toFolderEntry) {
-	return new Promise(function (resolve, reject) {
-		fileEntry.copyTo(toFolderEntry, '', function () {
-			return resolve();
-		}, function (err) {
-			return reject(new Error('cordova-code-swap: ' + JSON.stringify(err)));
-		});
-	});
-}
+// function copyFile(fileEntry, toFolderEntry) {
+// 	const fullPath = urlJoin(toFolderEntry.fullPath, fileEntry.fullPath);
+// 	return createFoldersInPath(fullPath, { endsInFile: true })
+// 		.then(destinationEntry => {
+// 			return new Promise((resolve, reject) => {
+// 				fileEntry.copyTo(
+// 					destinationEntry,
+// 					'',
+// 					() => resolve(),
+// 					err => reject(new Error('cordova-code-swap: ' + JSON.stringify(err)))
+// 				);
+// 			});
+// 		});
+// }
 
 module.exports = copyFiles;

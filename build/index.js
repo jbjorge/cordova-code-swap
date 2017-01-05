@@ -68,19 +68,23 @@ function lookForUpdates(url) {
  * @return {Promise}			Resolves with install function, rejects with error
  */
 function _download(updateInfo, options, progressCallback) {
-	var contentUrl = updateInfo.content_url;
+	// make a local copy of updateInfo so it can be mutated
+	var updateInfoClone = _extends({}, updateInfo);
+
+	var contentUrl = updateInfoClone.content_url;
 	var manifestUrl = urlJoin(contentUrl, 'chcp.manifest');
-	return request.get(manifestUrl, { headers: options.headers }).then(parseResponseToObject).then(function (manifest) {
-		return getCopyAndDownloadList(ccs, manifest);
+	return request.get(manifestUrl, { headers: options.headers }).then(parseResponseToObject).then(function (serverManifest) {
+		updateInfoClone.manifest = serverManifest;
+		return getCopyAndDownloadList(ccs.manifest, serverManifest);
 	}).then(function (fetchList) {
-		return fetchFiles(ccs, fetchList, updateInfo, options, progressCallback);
+		return fetchFiles(ccs, fetchList, updateInfoClone, options, progressCallback);
 	}).then(function () {
 		ccs.pendingInstallation = {};
-		ccs.pendingInstallation.updateInfo = updateInfo;
+		ccs.pendingInstallation.updateInfo = updateInfoClone;
 		ccs.pendingInstallation.options = options;
 		localStorage.ccs = JSON.stringify(ccs);
 	}).then(function () {
-		return _install.bind(null, updateInfo, options);
+		return _install.bind(null, updateInfoClone, options);
 	}).catch(function (err) {
 		ccs.pendingInstallation = false;
 		localStorage.ccs = JSON.stringify(ccs);
@@ -97,6 +101,7 @@ function _download(updateInfo, options, progressCallback) {
 function _install(updateInfo, options) {
 	ccs.pendingInstallation = false;
 	ccs.version = updateInfo.release;
+	ccs.manifest = updateInfo.manifest;
 	ccs.entryPoint = cordova.file.dataDirectory + sanitizeFolder(ccs.version) + '/' + options.entryFile;
 	localStorage.ccs = JSON.stringify(ccs);
 	window.location.href = ccs.entryPoint;

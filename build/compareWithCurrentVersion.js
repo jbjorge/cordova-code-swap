@@ -12,6 +12,8 @@ function compareWithCurrentVersion(ccs, updateInfo) {
 	return Promise.resolve().then(function () {
 		return throwIfCurrentVersionIsNewest(ccs, updateInfo);
 	}).then(function () {
+		return throwIfPendingInstallVersionIsSame(ccs, updateInfo);
+	}).then(function () {
 		return throwIfNativeVersionTooOld(ccs, updateInfo);
 	}).then(function () {
 		return updateInfo;
@@ -20,7 +22,13 @@ function compareWithCurrentVersion(ccs, updateInfo) {
 
 function throwIfCurrentVersionIsNewest(ccs, updateInfo) {
 	if (updateInfo.release === ccs.version) {
-		throw new Error('cordova-code-swap: ' + 'Current installed version is the same as the version on the update server.');
+		throw new Error('cordova-code-swap: Current installed version is the same as the version on the update server.');
+	}
+}
+
+function throwIfPendingInstallVersionIsSame(ccs, updateInfo) {
+	if (ccs.pendingInstallation && ccs.pendingInstallation.updateInfo && ccs.pendingInstallation.updateInfo.release === updateInfo.release) {
+		throw new Error('cordova-code-swap: Newest version is already downloaded, but not installed. Use .install() to install it.');
 	}
 }
 
@@ -28,7 +36,7 @@ function throwIfNativeVersionTooOld(ccs, updateInfo) {
 	if (!updateInfo.min_native_interface) return;
 
 	return getNativeVersion(ccs, updateInfo).then(function (nativeVersion) {
-		if (nativeVersion < updateInfo.min_native_interface) throw new Error('cordova-code-swap: ' + 'Native app version is too old to receive this update (min_native_interface is lower)');
+		if (nativeVersion < updateInfo.min_native_interface) throw new Error('cordova-code-swap: Native app version is too old to receive this update (min_native_interface is lower)');
 	});
 }
 
