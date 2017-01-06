@@ -8,6 +8,7 @@ This library is a drop-in-replacement for the client side of [cordova-hot-code-p
 - API returns promises
 - Can update your app on first run
 - Supports relative content_url path in chcp.json
+- Leaves checking min_native_version up to you (see example in [Usage](#usage))
 
 ## Installation
 
@@ -21,9 +22,6 @@ This library is a drop-in-replacement for the client side of [cordova-hot-code-p
 
 <!-- Required to download updates -->
 <plugin name="cordova-plugin-file-transfer" spec="1.6.1"/>
-
-<!-- Optional, used to compare min_native_interface in chcp.json -->
-<plugin name="cordova-plugin-app-version" spec="0.1.9"/>
 ```
 
 ## Creating the necessary files for the update server
@@ -35,6 +33,7 @@ See [cordova-hot-code-push-cli](https://github.com/nordnet/cordova-hot-code-push
 ```javascript
 var ccs = require('cordova-code-swap');
 var urlToUpdateEndpoint = 'https://example.com/my-app/';
+var myNativeVersion = getNativeVersion();
 var updateOptions = {
 	entryFile: 'app.html',
 	headers: {
@@ -46,7 +45,12 @@ document.addEventListener('deviceready', function(){
 	ccs.initialize() // must always be run before anything else
 	ccs.lookForUpdates(urlToUpdateEndpoint, updateOptions)
 		.catch(err => {})
-		.then(download => download())
+		.then(download => {
+			if (download.updateInfo.min_native_interface > myNativeVersion) {
+				throw new Error('Update received from the server requires newer native version of the app to be installed.');
+			}
+			return download();
+		})
 		.catch(downloadErr => {})
 		.then(install => install())
 		.catch(installErr => {});
@@ -96,7 +100,8 @@ The `download.updateInfo` object can e.g. look like this:
 {
 	"content_url": "https://example.com/my-app-name/", //(or "content_url": "/relative/to/chcp.json")
 	"release": "1.3.3",
-	"installTime": "afterRestart"
+	"installTime": "afterRestart",
+	"min_native_interface": 50
 }
 ```
 

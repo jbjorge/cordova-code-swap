@@ -15,6 +15,7 @@ const defaultOptions = {
 		'User-Agent': 'Cordova-Code-Swap'
 	}
 };
+var windowInstance;
 
 /**
  * PUBLIC
@@ -23,8 +24,8 @@ const defaultOptions = {
  * @return {Promise}
  */
 function initialize() {
-	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
-		window.location.href = ccs.entryPoint;
+	if (ccs.entryPoint && !windowInstance) {
+		windowInstance = window.open(ccs.entryPoint, '_self');
 	}
 	initialized = true;
 	return Promise.resolve();
@@ -103,8 +104,7 @@ function _install(updateInfo, options) {
 	ccs.manifest = updateInfo.manifest;
 	ccs.entryPoint = cordova.file.dataDirectory + sanitizeFolder(ccs.version) + '/' + options.entryFile;
 	localStorage.ccs = JSON.stringify(ccs);
-	window.location.href = ccs.entryPoint;
-	return Promise.resolve();
+	return initialize();
 }
 
 /**

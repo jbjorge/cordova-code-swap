@@ -1,6 +1,6 @@
 {
   "name": "cordova-code-swap",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Allows fetching updates to js-part of app",
   "main": "build/index.js",
   "repository": {

@@ -10,7 +10,6 @@ function compareWithCurrentVersion(ccs, updateInfo) {
 	return Promise.resolve()
 		.then(() => throwIfCurrentVersionIsNewest(ccs, updateInfo))
 		.then(() => throwIfPendingInstallVersionIsSame(ccs, updateInfo))
-		.then(() => throwIfNativeVersionTooOld(ccs, updateInfo))
 		.then(() => updateInfo);
 }
 
@@ -24,32 +23,6 @@ function throwIfPendingInstallVersionIsSame(ccs, updateInfo) {
 	if (ccs.pendingInstallation && ccs.pendingInstallation.updateInfo && ccs.pendingInstallation.updateInfo.release === updateInfo.release) {
 		throw new Error('cordova-code-swap: Newest version is already downloaded, but not installed. Use .install() to install it.');
 	}
-}
-
-function throwIfNativeVersionTooOld(ccs, updateInfo) {
-	if (!updateInfo.min_native_interface)
-		return;
-
-	return getNativeVersion(ccs, updateInfo)
-		.then(nativeVersion => {
-			if (nativeVersion < updateInfo.min_native_interface)
-				throw new Error('cordova-code-swap: Native app version is too old to receive this update (min_native_interface is lower)');
-		});
-}
-
-function getNativeVersion(ccs, updateInfo) {
-	return new Promise((resolve) => {
-		if (usingPlugin())
-			cordova.getAppVersion.getVersionCode(resolve);
-		else if (ccs.currentNativeVersion)
-			resolve(ccs.currentNativeVersion);
-		else
-			resolve(updateInfo.min_native_interface);
-	});
-}
-
-function usingPlugin() {
-	return cordova.getAppVersion && cordova.getAppVersion.getVersionCode;
 }
 
 module.exports = compareWithCurrentVersion;
