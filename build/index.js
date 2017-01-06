@@ -19,7 +19,6 @@ var defaultOptions = {
 		'User-Agent': 'Cordova-Code-Swap'
 	}
 };
-var windowInstance;
 
 /**
  * PUBLIC
@@ -28,8 +27,8 @@ var windowInstance;
  * @return {Promise}
  */
 function initialize() {
-	if (ccs.entryPoint && !windowInstance) {
-		windowInstance = window.open(ccs.entryPoint, '_self');
+	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
+		window.location.href = ccs.entryPoint;
 	}
 	initialized = true;
 	return Promise.resolve();
