@@ -10,7 +10,7 @@ function updateCCSConfig(ccs, updateInfo, options) {
 	// add current version to backups
 	if (ccsCopy.backups && !options.debug) {
 		ccsCopy.backups.push({
-			version: ccsCopy.release,
+			release: ccsCopy.release,
 			manifest: ccsCopy.manifest,
 			timestamp: ccsCopy.timestamp,
 			entryPoint: ccsCopy.entryPoint

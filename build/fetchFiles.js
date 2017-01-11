@@ -22,16 +22,20 @@ function fetchFiles(ccs, _ref, versionInfo, options) {
 	var contentUrl = versionInfo.content_url;
 	var dataDir = cordova.file.dataDirectory;
 	var destinationFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(versionInfo.release || '');
-	var srcFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(ccs.release || '');
+	var versionFolderName = sanitizeFolder(ccs.release || '');
 
 	return createFoldersInPath(destinationFolderName).then(function () {
-		return copyExistingFiles(dataDir, srcFolderName, filesToCopy, destinationFolderName);
-	}).catch(function () {
-		return downloadFiles(contentUrl, filesToCopy, destinationFolderName, options);
+		// abort copying/downloading existing files if in debug mode and trying to copy from 'ccsDebug' to 'ccsDebug'
+		if (versionFolderName == destinationFolderName) {
+			return;
+		}
+		return copyExistingFiles(dataDir, versionFolderName, filesToCopy, destinationFolderName).catch(function () {
+			return downloadFiles(contentUrl, filesToCopy, destinationFolderName, options);
+		}).then(function () {
+			return copyCordovaFiles(dataDir, destinationFolderName);
+		});
 	}).then(function () {
 		return downloadFiles(contentUrl, filesToDownload, destinationFolderName, options);
-	}).then(function () {
-		return copyCordovaFiles(dataDir, destinationFolderName);
 	});
 }
 
