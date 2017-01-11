@@ -38,7 +38,8 @@ var updateOptions = {
 	entryFile: 'app.html',
 	headers: {
 		'User-Agent': 'Cordova-Code-Swap'
-	}
+	},
+	debug: false
 };
 var instanceOptions = {
 	backupCount: 1
@@ -76,13 +77,20 @@ ccs.initialize(instanceOptions);
 ### Update options
 ```javascript
 var updateOptions = {
-	// path to your .html file, relative to the www-folder. Default is index.html
+	// Path to your .html file, relative to the www-folder. Default is index.html
 	entryFile: 'index.html',
 
-	// headers that will be sent with the requests to the update server
+	// Headers that will be sent with the requests to the update server
 	headers: {
 		key: value
-	}
+	},
+
+	// Debug mode will swap out files in the same folder on each update.
+	// This is to make it possible to keep breakpoints after fetching an update.
+	// This also disables instanceOptions.backup since it only works with one
+	// code source at all times
+	// Default is false.
+	debug: false
 }
 ccs.lookForUpdates('http://example.com/', updateOptions);
 ```

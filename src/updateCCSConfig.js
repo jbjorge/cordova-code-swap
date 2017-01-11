@@ -4,22 +4,21 @@ function updateCCSConfig(ccs, updateInfo, options) {
 	let ccsCopy = Object.assign({}, ccs);
 
 	// add current version to backups
-	if (ccsCopy.backups) {
+	if (ccsCopy.backups && !options.debug) {
 		ccsCopy.backups.push({
-			version: ccsCopy.version,
+			version: ccsCopy.release,
 			manifest: ccsCopy.manifest,
 			timestamp: ccsCopy.timestamp,
-			entryPoint: ccsCopy.entryPoint,
-			storageFolder: sanitizeFolder(ccsCopy.version)
+			entryPoint: ccsCopy.entryPoint
 		});
 	} else {
 		ccsCopy.backups = [];
 	}
 	ccsCopy.pendingInstallation = false;
-	ccsCopy.version = updateInfo.release;
+	ccsCopy.release = options.debug ? 'ccsDebug' : updateInfo.release;
 	ccsCopy.manifest = updateInfo.manifest;
 	ccsCopy.timestamp = Date.now();
-	ccsCopy.entryPoint = cordova.file.dataDirectory + sanitizeFolder(ccsCopy.version) + '/' + options.entryFile;
+	ccsCopy.entryPoint = cordova.file.dataDirectory + sanitizeFolder(ccsCopy.release) + '/' + options.entryFile;
 
 	return ccsCopy;
 }

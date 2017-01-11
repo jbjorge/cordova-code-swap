@@ -14,7 +14,8 @@ const defaultOptions = {
 	entryFile: 'index.html',
 	headers: {
 		'User-Agent': 'Cordova-Code-Swap'
-	}
+	},
+	debug: false
 };
 
 /**
@@ -115,11 +116,11 @@ function _install(updateInfo, options) {
 	// update the current the backup list
 	ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
 
-	return deleteBackups(backupsToDelete)
+	return Promise.resolve()
+		.then(() => options.debug ? null : deleteBackups(backupsToDelete))
 		.then(() => { localStorage.ccs = JSON.stringify(ccs); })
-		.then(initialize);
+		.then(() => options.debug ? window.location.reload() : initialize());
 }
-
 
 /**
  * PUBLIC

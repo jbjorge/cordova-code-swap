@@ -14,7 +14,7 @@ function compareWithCurrentVersion(ccs, updateInfo) {
 }
 
 function throwIfCurrentVersionIsNewest(ccs, updateInfo) {
-	if (updateInfo.release === ccs.version) {
+	if (updateInfo.release === ccs.release) {
 		throw new Error('cordova-code-swap: Current installed version is the same as the version on the update server.');
 	}
 }

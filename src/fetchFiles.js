@@ -15,11 +15,12 @@ const copyCordovaFiles = require('./copyCordovaFiles');
  */
 function fetchFiles(ccs, { filesToCopy, filesToDownload }, versionInfo, options) {
 	const contentUrl = versionInfo.content_url;
-	const destinationFolderName = sanitizeFolder(versionInfo.release);
 	const dataDir = cordova.file.dataDirectory;
+	const destinationFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(versionInfo.release || '');
+	const srcFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(ccs.release || '');
 
 	return createFoldersInPath(destinationFolderName)
-		.then(() => copyExistingFiles(ccs, dataDir, filesToCopy, destinationFolderName))
+		.then(() => copyExistingFiles(dataDir, srcFolderName, filesToCopy, destinationFolderName))
 		.catch(() => downloadFiles(contentUrl, filesToCopy, destinationFolderName, options))
 		.then(() => downloadFiles(contentUrl, filesToDownload, destinationFolderName, options))
 		.then(() => copyCordovaFiles(dataDir, destinationFolderName));
