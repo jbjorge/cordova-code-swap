@@ -17,13 +17,19 @@ function fetchFiles(ccs, { filesToCopy, filesToDownload }, versionInfo, options)
 	const contentUrl = versionInfo.content_url;
 	const dataDir = cordova.file.dataDirectory;
 	const destinationFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(versionInfo.release || '');
-	const srcFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(ccs.release || '');
+	const versionFolderName = sanitizeFolder(ccs.release || '');
 
 	return createFoldersInPath(destinationFolderName)
-		.then(() => copyExistingFiles(dataDir, srcFolderName, filesToCopy, destinationFolderName))
-		.catch(() => downloadFiles(contentUrl, filesToCopy, destinationFolderName, options))
-		.then(() => downloadFiles(contentUrl, filesToDownload, destinationFolderName, options))
-		.then(() => copyCordovaFiles(dataDir, destinationFolderName));
+		.then(() => {
+			// abort copying/downloading existing files if in debug mode and trying to copy from 'ccsDebug' to 'ccsDebug'
+			if (versionFolderName == destinationFolderName) {
+				return;
+			}
+			return copyExistingFiles(dataDir, versionFolderName, filesToCopy, destinationFolderName)
+				.catch(() => downloadFiles(contentUrl, filesToCopy, destinationFolderName, options))
+				.then(() => copyCordovaFiles(dataDir, destinationFolderName));
+		})
+		.then(() => downloadFiles(contentUrl, filesToDownload, destinationFolderName, options));
 }
 
 module.exports = fetchFiles;
