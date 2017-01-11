@@ -40,9 +40,12 @@ var updateOptions = {
 		'User-Agent': 'Cordova-Code-Swap'
 	}
 };
+var instanceOptions = {
+	backupCount: 1
+};
 
 document.addEventListener('deviceready', function(){
-	ccs.initialize() // must always be run before anything else
+	ccs.initialize(instanceOptions) // must always be run before anything else
 	ccs.lookForUpdates(urlToUpdateEndpoint, updateOptions)
 		.catch(err => {})
 		.then(download => {
@@ -61,7 +64,16 @@ document.addEventListener('deviceready', function(){
 ```
 
 ## Options
+### Instance options
+```javascript
+var instanceOptions = {
+	// how many of previously installed versions it should keep. Default is 1.
+	backupCount: 1
+}
+ccs.initialize(instanceOptions);
+```
 
+### Update options
 ```javascript
 var updateOptions = {
 	// path to your .html file, relative to the www-folder. Default is index.html
@@ -72,11 +84,12 @@ var updateOptions = {
 		key: value
 	}
 }
+ccs.lookForUpdates('http://example.com/', updateOptions);
 ```
 
 ## API
 
-#### `ccs.initialize()`
+#### `ccs.initialize(...)`
 Returns a promise that always resolves.
 Must be run before anything else!
 Checks if a version has been downloaded earlier and should be loaded. If so, it changes the window.location.href to the downloaded .html file.

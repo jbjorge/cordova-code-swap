@@ -5,10 +5,11 @@ const getCopyAndDownloadList = require('./getCopyAndDownloadList');
 const compareWithCurrentVersion = require('./compareWithCurrentVersion');
 const parseResponseToObject = require('./parseResponseToObject');
 const urlJoin = require('url-join');
-const sanitizeFolder = require('filenamify');
+const updateCCSConfig = require('./updateCCSConfig');
 const getContentUrl = require('./getContentUrl');
 var initialized = false;
-const ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
+var ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
+var _instanceOptions;
 const defaultOptions = {
 	entryFile: 'index.html',
 	headers: {
@@ -22,7 +23,11 @@ const defaultOptions = {
  * Switches to the last downloaded update if any
  * @return {Promise}
  */
-function initialize() {
+function initialize(instanceOptions = {}) {
+	if (!initialized) {
+		_instanceOptions = Object.assign({}, instanceOptions, { backupCount: 1 });
+	}
+
 	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
 		window.location.href = ccs.entryPoint;
 	}
@@ -98,13 +103,23 @@ function _download(updateInfo, options, progressCallback) {
  * @return {Promise}
  */
 function _install(updateInfo, options) {
-	ccs.pendingInstallation = false;
-	ccs.version = updateInfo.release;
-	ccs.manifest = updateInfo.manifest;
-	ccs.entryPoint = cordova.file.dataDirectory + sanitizeFolder(ccs.version) + '/' + options.entryFile;
-	localStorage.ccs = JSON.stringify(ccs);
-	return initialize();
+	const deleteBackups = require('./deleteBackups');
+
+	// create new config with settings needed to load the newly installed version
+	ccs = updateCCSConfig(ccs, updateInfo, options);
+
+	// find obsolete backups
+	let sortedBackups = ccs.backups.sort((b1, b2) => b1.timestamp || 0 < b2.timestamp || 0);
+	let backupsToDelete = sortedBackups.slice(_instanceOptions.backupCount, sortedBackups.length);
+	
+	// update the current the backup list
+	ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
+
+	return deleteBackups(backupsToDelete)
+		.then(() => { localStorage.ccs = JSON.stringify(ccs); })
+		.then(initialize);
 }
+
 
 /**
  * PUBLIC
