@@ -3,6 +3,8 @@
 var getFileSystem = require('./getFileSystem');
 var deleteFolder = require('./deleteFolder');
 var getFolder = require('./getFolder');
+var sanitizeFolder = require('filenamify');
+var Promise = require('bluebird');
 
 function deleteBackups(backupList) {
 	return getFileSystem(cordova.file.dataDirectory).then(function (fs) {
@@ -12,7 +14,7 @@ function deleteBackups(backupList) {
 
 function getFolderEntries(fs, backupList) {
 	var getFolderPromises = backupList.map(function (backup) {
-		return getFolder(fs, backup.storageFolder, { create: false });
+		return getFolder(fs, sanitizeFolder(backup.release), { create: false });
 	});
 	var reflections = getFolderPromises.map(function (getFolderPromise) {
 		return getFolderPromise.reflect();

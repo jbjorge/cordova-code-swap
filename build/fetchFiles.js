@@ -16,22 +16,23 @@ var copyCordovaFiles = require('./copyCordovaFiles');
  * @return {Promise}
  */
 function fetchFiles(ccs, _ref, versionInfo, options) {
-  var filesToCopy = _ref.filesToCopy,
-      filesToDownload = _ref.filesToDownload;
+	var filesToCopy = _ref.filesToCopy,
+	    filesToDownload = _ref.filesToDownload;
 
-  var contentUrl = versionInfo.content_url;
-  var destinationFolderName = sanitizeFolder(versionInfo.release);
-  var dataDir = cordova.file.dataDirectory;
+	var contentUrl = versionInfo.content_url;
+	var dataDir = cordova.file.dataDirectory;
+	var destinationFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(versionInfo.release || '');
+	var srcFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(ccs.release || '');
 
-  return createFoldersInPath(destinationFolderName).then(function () {
-    return copyExistingFiles(ccs, dataDir, filesToCopy, destinationFolderName);
-  }).catch(function () {
-    return downloadFiles(contentUrl, filesToCopy, destinationFolderName, options);
-  }).then(function () {
-    return downloadFiles(contentUrl, filesToDownload, destinationFolderName, options);
-  }).then(function () {
-    return copyCordovaFiles(dataDir, destinationFolderName);
-  });
+	return createFoldersInPath(destinationFolderName).then(function () {
+		return copyExistingFiles(dataDir, srcFolderName, filesToCopy, destinationFolderName);
+	}).catch(function () {
+		return downloadFiles(contentUrl, filesToCopy, destinationFolderName, options);
+	}).then(function () {
+		return downloadFiles(contentUrl, filesToDownload, destinationFolderName, options);
+	}).then(function () {
+		return copyCordovaFiles(dataDir, destinationFolderName);
+	});
 }
 
 module.exports = fetchFiles;

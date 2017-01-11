@@ -18,7 +18,8 @@ var defaultOptions = {
 	entryFile: 'index.html',
 	headers: {
 		'User-Agent': 'Cordova-Code-Swap'
-	}
+	},
+	debug: false
 };
 
 /**
@@ -120,9 +121,13 @@ function _install(updateInfo, options) {
 	// update the current the backup list
 	ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
 
-	return deleteBackups(backupsToDelete).then(function () {
+	return Promise.resolve().then(function () {
+		return options.debug ? null : deleteBackups(backupsToDelete);
+	}).then(function () {
 		localStorage.ccs = JSON.stringify(ccs);
-	}).then(initialize);
+	}).then(function () {
+		return options.debug ? window.location.reload() : initialize();
+	});
 }
 
 /**
