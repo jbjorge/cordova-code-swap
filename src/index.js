@@ -26,7 +26,7 @@ const defaultOptions = {
  */
 function initialize(instanceOptions = {}) {
 	if (!initialized) {
-		_instanceOptions = Object.assign({}, instanceOptions, { backupCount: 1 });
+		_instanceOptions = Object.assign({}, { backupCount: 1 }, instanceOptions);
 	}
 
 	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
