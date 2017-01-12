@@ -25,15 +25,18 @@ const defaultOptions = {
  * @return {Promise}
  */
 function initialize(instanceOptions = {}) {
-	if (!initialized) {
-		_instanceOptions = Object.assign({}, { backupCount: 1 }, instanceOptions);
-	}
+	return new Promise((resolve) => {
+		if (!initialized) {
+			_instanceOptions = Object.assign({}, { backupCount: 1 }, instanceOptions);
+			initialized = true;
+		}
 
-	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
-		window.location.href = ccs.entryPoint;
-	}
-	initialized = true;
-	return Promise.resolve();
+		if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
+			window.location.href = ccs.entryPoint;
+		} else {
+			resolve();
+		}
+	});
 }
 
 /**
