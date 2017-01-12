@@ -26,13 +26,18 @@ const defaultOptions = {
  */
 function initialize(instanceOptions = {}) {
 	if (!initialized) {
-		_instanceOptions = Object.assign({}, instanceOptions, { backupCount: 1 });
+		_instanceOptions = Object.assign({}, { backupCount: 1, iframe: false }, instanceOptions);
+		initialized = true;
 	}
 
-	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
-		window.location.href = ccs.entryPoint;
+	if (ccs.entryPoint) {
+		if (_instanceOptions.iframe) {
+			return Promise.resolve(ccs.entryPoint);
+		}
+		else if (ccs.entryPoint !== window.location.href){
+			window.location.href = ccs.entryPoint;
+		}
 	}
-	initialized = true;
 	return Promise.resolve();
 }
 
@@ -68,7 +73,7 @@ function lookForUpdates(url, options = {}) {
  * @param  {Object} options     Options to use when communicating with the server. See https://www.npmjs.com/package/request
  * @return {Promise}			Resolves with install function, rejects with error
  */
-function _download(updateInfo, options, progressCallback) {
+function _download(updateInfo, options) {
 	// make a local copy of updateInfo so it can be mutated
 	let updateInfoClone = Object.assign({}, updateInfo);
 
@@ -80,7 +85,7 @@ function _download(updateInfo, options, progressCallback) {
 			updateInfoClone.manifest = serverManifest;
 			return getCopyAndDownloadList(ccs.manifest, serverManifest);
 		})
-		.then(fetchList => fetchFiles(ccs, fetchList, updateInfoClone, options, progressCallback))
+		.then(fetchList => fetchFiles(ccs, fetchList, updateInfoClone, options, _instanceOptions))
 		.then(() => {
 			ccs.pendingInstallation = {};
 			ccs.pendingInstallation.updateInfo = updateInfoClone;
