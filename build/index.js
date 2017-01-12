@@ -32,7 +32,7 @@ function initialize() {
 	var instanceOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 	if (!initialized) {
-		_instanceOptions = _extends({}, instanceOptions, { backupCount: 1 });
+		_instanceOptions = _extends({}, { backupCount: 1 }, instanceOptions);
 	}
 
 	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
