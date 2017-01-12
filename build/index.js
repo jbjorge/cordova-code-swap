@@ -21,6 +21,9 @@ var defaultOptions = {
 	},
 	debug: false
 };
+var isLookingForUpdates = false;
+var isDownloading = false;
+var isInstalling = false;
 
 /**
  * PUBLIC
@@ -31,15 +34,18 @@ var defaultOptions = {
 function initialize() {
 	var instanceOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-	if (!initialized) {
-		_instanceOptions = _extends({}, { backupCount: 1 }, instanceOptions);
-	}
+	return new Promise(function (resolve) {
+		if (!initialized) {
+			_instanceOptions = _extends({}, { backupCount: 1 }, instanceOptions);
+			initialized = true;
+		}
 
-	if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
-		window.location.href = ccs.entryPoint;
-	}
-	initialized = true;
-	return Promise.resolve();
+		if (ccs.entryPoint && ccs.entryPoint !== window.location.href) {
+			window.location.href = ccs.entryPoint;
+		} else {
+			resolve();
+		}
+	});
 }
 
 /**
@@ -56,8 +62,13 @@ function lookForUpdates(url) {
 		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
 	}
 
+	if (isLookingForUpdates) {
+		return Promise.reject(new Error('cordova-code-swap: .lookForUpdates is already running.'));
+	}
+
 	options = _extends({}, defaultOptions, options);
 	var updateDeclaration = urlJoin(url, 'chcp.json');
+	isLookingForUpdates = true;
 
 	return request.get(updateDeclaration, { headers: options.headers }).then(parseResponseToObject).then(function (updateInfo) {
 		return compareWithCurrentVersion(ccs, updateInfo);
@@ -65,7 +76,11 @@ function lookForUpdates(url) {
 		updateInfo.content_url = getContentUrl(url, updateInfo);
 		var downloadFunction = _download.bind(null, updateInfo, options);
 		downloadFunction.updateInfo = updateInfo;
+		isLookingForUpdates = false;
 		return downloadFunction;
+	}).catch(function (err) {
+		isLookingForUpdates = false;
+		throw err;
 	});
 }
 
@@ -76,8 +91,13 @@ function lookForUpdates(url) {
  * @return {Promise}			Resolves with install function, rejects with error
  */
 function _download(updateInfo, options, progressCallback) {
+	if (isDownloading) {
+		throw new Error('cordova-code-swap: A download is already in progress.');
+	}
+
 	// make a local copy of updateInfo so it can be mutated
 	var updateInfoClone = _extends({}, updateInfo);
+	isDownloading = true;
 
 	var contentUrl = updateInfoClone.content_url;
 	var manifestUrl = urlJoin(contentUrl, 'chcp.manifest');
@@ -91,10 +111,12 @@ function _download(updateInfo, options, progressCallback) {
 		ccs.pendingInstallation.updateInfo = updateInfoClone;
 		ccs.pendingInstallation.options = options;
 		localStorage.ccs = JSON.stringify(ccs);
-	}).then(function () {
+
+		isDownloading = false;
 		return _install.bind(null, updateInfoClone, options);
 	}).catch(function (err) {
 		ccs.pendingInstallation = false;
+		isDownloading = false;
 		localStorage.ccs = JSON.stringify(ccs);
 		throw err;
 	});
@@ -107,7 +129,11 @@ function _download(updateInfo, options, progressCallback) {
  * @return {Promise}
  */
 function _install(updateInfo, options) {
+	if (isInstalling) {
+		Promise.reject('cordova-code-swap: An installation is already in progress');
+	}
 	var deleteBackups = require('./deleteBackups');
+	isInstalling = true;
 
 	// create new config with settings needed to load the newly installed version
 	ccs = updateCCSConfig(ccs, updateInfo, options);
@@ -126,7 +152,13 @@ function _install(updateInfo, options) {
 	}).then(function () {
 		localStorage.ccs = JSON.stringify(ccs);
 	}).then(function () {
-		return options.debug ? window.location.reload() : initialize();
+		isInstalling = false;
+	}, function (err) {
+		isInstalling = false;throw err;
+	}).then(function () {
+		return options.debug ? new Promise(function () {
+			return window.location.reload();
+		}) : initialize();
 	});
 }
 
