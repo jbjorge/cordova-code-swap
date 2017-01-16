@@ -7,16 +7,13 @@ const parseResponseToObject = require('./parseResponseToObject');
 const urlJoin = require('url-join');
 const updateCCSConfig = require('./updateCCSConfig');
 const getContentUrl = require('./getContentUrl');
+const defaultOptions = require('./defaultOptions');
 var initialized = false;
 var ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
 var _instanceOptions;
-const defaultOptions = {
-	entryFile: 'index.html',
-	headers: {
-		'User-Agent': 'Cordova-Code-Swap'
-	},
-	debug: false
-};
+var isLookingForUpdates = false;
+var isDownloading = false;
+var isInstalling = false;
 
 /**
  * PUBLIC
@@ -25,20 +22,24 @@ const defaultOptions = {
  * @return {Promise}
  */
 function initialize(instanceOptions = {}) {
-	if (!initialized) {
-		_instanceOptions = Object.assign({}, { backupCount: 1, iframe: false }, instanceOptions);
-		initialized = true;
-	}
+	return new Promise((resolve) => {
+		if (!initialized) {
+			_instanceOptions = Object.assign({}, defaultOptions.instance, instanceOptions);
+			initialized = true;
+		}
 
-	if (ccs.entryPoint) {
-		if (_instanceOptions.iframe) {
-			return Promise.resolve(ccs.entryPoint);
+		if (ccs.entryPoint) {
+			if (_instanceOptions.iframe) {
+				resolve(ccs.entryPoint);
+			} else if (ccs.entryPoint !== window.location.href) {
+				window.location.href = ccs.entryPoint;
+			} else {
+				resolve();
+			}
+		} else {
+			resolve();
 		}
-		else if (ccs.entryPoint !== window.location.href){
-			window.location.href = ccs.entryPoint;
-		}
-	}
-	return Promise.resolve();
+	});
 }
 
 /**
@@ -53,8 +54,13 @@ function lookForUpdates(url, options = {}) {
 		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
 	}
 
+	if (isLookingForUpdates) {
+		return Promise.reject(new Error('cordova-code-swap: .lookForUpdates is already running.'));
+	}
+
 	options = Object.assign({}, defaultOptions, options);
 	const updateDeclaration = urlJoin(url, 'chcp.json');
+	isLookingForUpdates = true;
 
 	return request.get(updateDeclaration, { headers: options.headers })
 		.then(parseResponseToObject)
@@ -63,7 +69,12 @@ function lookForUpdates(url, options = {}) {
 			updateInfo.content_url = getContentUrl(url, updateInfo);
 			var downloadFunction = _download.bind(null, updateInfo, options);
 			downloadFunction.updateInfo = updateInfo;
+			isLookingForUpdates = false;
 			return downloadFunction;
+		})
+		.catch(err => {
+			isLookingForUpdates = false;
+			throw err;
 		});
 }
 
@@ -74,8 +85,13 @@ function lookForUpdates(url, options = {}) {
  * @return {Promise}			Resolves with install function, rejects with error
  */
 function _download(updateInfo, options) {
+	if (isDownloading) {
+		throw new Error('cordova-code-swap: A download is already in progress.');
+	}
+
 	// make a local copy of updateInfo so it can be mutated
 	let updateInfoClone = Object.assign({}, updateInfo);
+	isDownloading = true;
 
 	var contentUrl = updateInfoClone.content_url;
 	var manifestUrl = urlJoin(contentUrl, 'chcp.manifest');
@@ -91,12 +107,13 @@ function _download(updateInfo, options) {
 			ccs.pendingInstallation.updateInfo = updateInfoClone;
 			ccs.pendingInstallation.options = options;
 			localStorage.ccs = JSON.stringify(ccs);
-		})
-		.then(() => {
+
+			isDownloading = false;
 			return _install.bind(null, updateInfoClone, options);
 		})
 		.catch(err => {
 			ccs.pendingInstallation = false;
+			isDownloading = false;
 			localStorage.ccs = JSON.stringify(ccs);
 			throw err;
 		});
@@ -109,7 +126,11 @@ function _download(updateInfo, options) {
  * @return {Promise}
  */
 function _install(updateInfo, options) {
+	if (isInstalling) {
+		Promise.reject('cordova-code-swap: An installation is already in progress');
+	}
 	const deleteBackups = require('./deleteBackups');
+	isInstalling = true;
 
 	// create new config with settings needed to load the newly installed version
 	ccs = updateCCSConfig(ccs, updateInfo, options);
@@ -117,14 +138,18 @@ function _install(updateInfo, options) {
 	// find obsolete backups
 	let sortedBackups = ccs.backups.sort((b1, b2) => b1.timestamp || 0 < b2.timestamp || 0);
 	let backupsToDelete = sortedBackups.slice(_instanceOptions.backupCount, sortedBackups.length);
-	
+
 	// update the current the backup list
 	ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
 
 	return Promise.resolve()
 		.then(() => options.debug ? null : deleteBackups(backupsToDelete))
 		.then(() => { localStorage.ccs = JSON.stringify(ccs); })
-		.then(() => options.debug ? window.location.reload() : initialize());
+		.then(
+			() => { isInstalling = false; },
+			err => { isInstalling = false; throw err; }
+		)
+		.then(() => options.debug ? new Promise(() => window.location.reload()) : initialize());
 }
 
 /**

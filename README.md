@@ -47,17 +47,19 @@ var instanceOptions = {
 
 document.addEventListener('deviceready', function(){
 	ccs.initialize(instanceOptions) // must always be run before anything else
-	ccs.lookForUpdates(urlToUpdateEndpoint, updateOptions)
-		.catch(err => {})
-		.then(download => {
-			if (download.updateInfo.min_native_interface > myNativeVersion) {
-				throw new Error('Update received from the server requires newer native version of the app to be installed.');
-			}
-			return download();
-		})
-		.catch(downloadErr => {})
-		.then(install => install())
-		.catch(installErr => {});
+	.then(function(){
+		return ccs.lookForUpdates(urlToUpdateEndpoint, updateOptions)
+			.catch(err => {})
+			.then(download => {
+				if (download.updateInfo.min_native_interface > myNativeVersion) {
+					throw new Error('Update received from the server requires newer native version of the app to be installed.');
+				}
+				return download();
+			})
+			.catch(downloadErr => {})
+			.then(install => install())
+			.catch(installErr => {});
+	});
 
 	// optional
 	ccs.install(); // <-- can be used after e.g. restarting the app if there is a downloaded update that has not been installed yet.
@@ -69,7 +71,12 @@ document.addEventListener('deviceready', function(){
 ```javascript
 var instanceOptions = {
 	// how many of previously installed versions it should keep. Default is 1.
-	backupCount: 1
+	backupCount: 1,
+
+	// Setting iframe to true causes .initialize() and .install() to return
+	// the url of where the downloaded .html entry point recides.
+	// This can be useful if you want to run the downloaded app inside an iframe.
+	iframe: false
 }
 ccs.initialize(instanceOptions);
 ```
