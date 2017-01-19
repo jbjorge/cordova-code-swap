@@ -12,6 +12,7 @@ var urlJoin = require('url-join');
 var updateCCSConfig = require('./updateCCSConfig');
 var getContentUrl = require('./getContentUrl');
 var defaultOptions = require('./defaultOptions');
+var negotiateStartReloadService = require('./negotiateStartReloadService');
 var initialized = false;
 var ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
 var _instanceOptions;
@@ -22,7 +23,7 @@ var isInstalling = false;
 /**
  * PUBLIC
  * Initialize the CCS instance
- * Switches to the last downloaded update if any
+ * @param {Object} instanceOptions - Options to use for the instance.
  * @return {Promise}
  */
 function initialize() {
@@ -32,6 +33,7 @@ function initialize() {
 		if (!initialized) {
 			_instanceOptions = _extends({}, defaultOptions.instance, instanceOptions);
 			initialized = true;
+			negotiateStartReloadService(_instanceOptions.debug, lookForUpdates);
 		}
 
 		if (ccs.entryPoint) {
@@ -51,9 +53,9 @@ function initialize() {
 /**
  * PUBLIC
  * Looks for updates on the server
- * @param  {String} url     Url to the update server
- * @param  {Object} options Options to use when communicating with the server. See https://www.npmjs.com/package/request
- * @return {Promise}		Resolves with download function, rejects with error.
+ * @param  {String} url    	- Url to the update server
+ * @param  {Object} options - Options to use when communicating with the server.
+ * @return {Promise}		- Resolves with download function, rejects with error.
  */
 function lookForUpdates(url) {
 	var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -66,7 +68,7 @@ function lookForUpdates(url) {
 		return Promise.reject(new Error('cordova-code-swap: .lookForUpdates is already running.'));
 	}
 
-	options = _extends({}, defaultOptions, options);
+	options = _extends({}, defaultOptions.update, options);
 	var updateDeclaration = urlJoin(url, 'chcp.json');
 	isLookingForUpdates = true;
 
@@ -86,9 +88,9 @@ function lookForUpdates(url) {
 
 /**
  * Get the update - this function is returned in the resolved promise of lookForUpdates
- * @param  {Object} updateInfo	The info received from the server
- * @param  {Object} options     Options to use when communicating with the server. See https://www.npmjs.com/package/request
- * @return {Promise}			Resolves with install function, rejects with error
+ * @param  {Object} updateInfo	- The info received from the server
+ * @param  {Object} options     - Options to use when communicating with the server.
+ * @return {Promise}			- Resolves with install function, rejects with error
  */
 function _download(updateInfo, options) {
 	if (isDownloading) {
@@ -124,8 +126,8 @@ function _download(updateInfo, options) {
 
 /**
  * Install the update - this function is returned in the resolved promise of _download
- * @param  {Object} updateInfo The info received from the server
- * @param  {Object} options    Name of the entry point when redirecting to this update
+ * @param  {Object} updateInfo 	- The info received from the server
+ * @param  {Object} options    	- Name of the entry point when redirecting to this update
  * @return {Promise}
  */
 function _install(updateInfo, options) {
@@ -136,7 +138,7 @@ function _install(updateInfo, options) {
 	isInstalling = true;
 
 	// create new config with settings needed to load the newly installed version
-	ccs = updateCCSConfig(ccs, updateInfo, options);
+	ccs = updateCCSConfig(ccs, updateInfo, options, _instanceOptions);
 
 	// find obsolete backups
 	var sortedBackups = ccs.backups.sort(function (b1, b2) {
@@ -148,7 +150,7 @@ function _install(updateInfo, options) {
 	ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
 
 	return Promise.resolve().then(function () {
-		return options.debug ? null : deleteBackups(backupsToDelete);
+		return _instanceOptions.debug.preserveBreakpoints ? null : deleteBackups(backupsToDelete);
 	}).then(function () {
 		localStorage.ccs = JSON.stringify(ccs);
 	}).then(function () {
@@ -156,7 +158,7 @@ function _install(updateInfo, options) {
 	}, function (err) {
 		isInstalling = false;throw err;
 	}).then(function () {
-		return options.debug ? new Promise(function () {
+		return _instanceOptions.debug.preserveBreakpoints && !_instanceOptions.iframe ? new Promise(function () {
 			return window.location.reload();
 		}) : initialize();
 	});

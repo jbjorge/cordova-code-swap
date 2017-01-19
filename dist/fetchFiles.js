@@ -21,7 +21,7 @@ function fetchFiles(ccs, _ref, versionInfo, options, instanceOptions) {
 
 	var contentUrl = versionInfo.content_url;
 	var dataDir = cordova.file.dataDirectory;
-	var destinationFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(versionInfo.release || '');
+	var destinationFolderName = instanceOptions.debug.preserveBreakpoints ? 'ccsDebug' : sanitizeFolder(versionInfo.release || '');
 	var versionFolderName = sanitizeFolder(ccs.release || '');
 
 	return createFoldersInPath(destinationFolderName).then(function () {

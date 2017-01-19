@@ -16,7 +16,7 @@ const copyCordovaFiles = require('./copyCordovaFiles');
 function fetchFiles(ccs, { filesToCopy, filesToDownload }, versionInfo, options, instanceOptions) {
 	const contentUrl = versionInfo.content_url;
 	const dataDir = cordova.file.dataDirectory;
-	const destinationFolderName = options.debug ? 'ccsDebug' : sanitizeFolder(versionInfo.release || '');
+	const destinationFolderName = instanceOptions.debug.preserveBreakpoints ? 'ccsDebug' : sanitizeFolder(versionInfo.release || '');
 	const versionFolderName = sanitizeFolder(ccs.release || '');
 
 	return createFoldersInPath(destinationFolderName)
