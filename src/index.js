@@ -9,8 +9,8 @@ const updateCCSConfig = require('./updateCCSConfig');
 const getContentUrl = require('./getContentUrl');
 const defaultOptions = require('./defaultOptions');
 const negotiateStartReloadService = require('./negotiateStartReloadService');
-var initialized = false;
-var ccs = JSON.parse(localStorage.ccs || JSON.stringify({}));
+var _initialized = false;
+var _ccs;
 var _instanceOptions;
 var isLookingForUpdates = false;
 var isDownloading = false;
@@ -24,17 +24,20 @@ var isInstalling = false;
  */
 function initialize(instanceOptions = {}) {
 	return new Promise((resolve) => {
-		if (!initialized) {
+		// fetch ccs config from localStorage if not fetched before
+		_ccs = _ccs || JSON.parse(localStorage.ccs || JSON.stringify({}));
+
+		if (!_initialized) {
 			_instanceOptions = Object.assign({}, defaultOptions.instance, instanceOptions);
-			initialized = true;
+			_initialized = true;
 			negotiateStartReloadService(_instanceOptions.debug, lookForUpdates);
 		}
 
-		if (ccs.entryPoint) {
+		if (_ccs.entryPoint) {
 			if (_instanceOptions.iframe) {
-				resolve(ccs.entryPoint);
-			} else if (ccs.entryPoint !== window.location.href) {
-				window.location.href = ccs.entryPoint;
+				resolve(_ccs.entryPoint);
+			} else if (_ccs.entryPoint !== window.location.href) {
+				window.location.href = _ccs.entryPoint;
 			} else {
 				resolve();
 			}
@@ -52,7 +55,7 @@ function initialize(instanceOptions = {}) {
  * @return {Promise}		- Resolves with download function, rejects with error.
  */
 function lookForUpdates(url, options = {}) {
-	if (!initialized) {
+	if (!_initialized) {
 		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
 	}
 
@@ -66,7 +69,7 @@ function lookForUpdates(url, options = {}) {
 
 	return request.get(updateDeclaration, { headers: options.headers })
 		.then(parseResponseToObject)
-		.then(updateInfo => compareWithCurrentVersion(ccs, updateInfo))
+		.then(updateInfo => compareWithCurrentVersion(_ccs, updateInfo))
 		.then(updateInfo => {
 			updateInfo.content_url = getContentUrl(url, updateInfo);
 			var downloadFunction = _download.bind(null, updateInfo, options);
@@ -101,22 +104,22 @@ function _download(updateInfo, options) {
 		.then(parseResponseToObject)
 		.then(serverManifest => {
 			updateInfoClone.manifest = serverManifest;
-			return getCopyAndDownloadList(ccs.manifest, serverManifest);
+			return getCopyAndDownloadList(_ccs.manifest, serverManifest);
 		})
-		.then(fetchList => fetchFiles(ccs, fetchList, updateInfoClone, options, _instanceOptions))
+		.then(fetchList => fetchFiles(_ccs, fetchList, updateInfoClone, options, _instanceOptions))
 		.then(() => {
-			ccs.pendingInstallation = {};
-			ccs.pendingInstallation.updateInfo = updateInfoClone;
-			ccs.pendingInstallation.options = options;
-			localStorage.ccs = JSON.stringify(ccs);
+			_ccs.pendingInstallation = {};
+			_ccs.pendingInstallation.updateInfo = updateInfoClone;
+			_ccs.pendingInstallation.options = options;
+			localStorage.ccs = JSON.stringify(_ccs);
 
 			isDownloading = false;
 			return _install.bind(null, updateInfoClone, options);
 		})
 		.catch(err => {
-			ccs.pendingInstallation = false;
+			_ccs.pendingInstallation = false;
 			isDownloading = false;
-			localStorage.ccs = JSON.stringify(ccs);
+			localStorage.ccs = JSON.stringify(_ccs);
 			throw err;
 		});
 }
@@ -135,18 +138,18 @@ function _install(updateInfo, options) {
 	isInstalling = true;
 
 	// create new config with settings needed to load the newly installed version
-	ccs = updateCCSConfig(ccs, updateInfo, options, _instanceOptions);
+	_ccs = updateCCSConfig(_ccs, updateInfo, options, _instanceOptions);
 
 	// find obsolete backups
-	let sortedBackups = ccs.backups.sort((b1, b2) => b1.timestamp || 0 < b2.timestamp || 0);
+	let sortedBackups = _ccs.backups.sort((b1, b2) => b1.timestamp || 0 < b2.timestamp || 0);
 	let backupsToDelete = sortedBackups.slice(_instanceOptions.backupCount, sortedBackups.length);
 
 	// update the current the backup list
-	ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
+	_ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
 
 	return Promise.resolve()
 		.then(() => _instanceOptions.debug.preserveBreakpoints ? null : deleteBackups(backupsToDelete))
-		.then(() => { localStorage.ccs = JSON.stringify(ccs); })
+		.then(() => { localStorage.ccs = JSON.stringify(_ccs); })
 		.then(
 			() => { isInstalling = false; },
 			err => { isInstalling = false; throw err; }
@@ -160,8 +163,11 @@ function _install(updateInfo, options) {
  * @return {Promise}
  */
 function install() {
-	if (ccs.pendingInstallation) {
-		return _install(ccs.pendingInstallation.updateInfo, ccs.pendingInstallation.options);
+	if (!_initialized) {
+		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
+	}
+	if (_ccs.pendingInstallation) {
+		return _install(_ccs.pendingInstallation.updateInfo, _ccs.pendingInstallation.options);
 	} else {
 		return Promise.reject(new Error('cordova-code-swap: Tried to install update, but no updates have been previously downloaded.'));
 	}
