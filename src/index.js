@@ -1,14 +1,4 @@
-const request = require('./request');
 const Promise = require('bluebird');
-const fetchFiles = require('./fetchFiles');
-const getCopyAndDownloadList = require('./getCopyAndDownloadList');
-const compareWithCurrentVersion = require('./compareWithCurrentVersion');
-const parseResponseToObject = require('./parseResponseToObject');
-const urlJoin = require('url-join');
-const updateCCSConfig = require('./updateCCSConfig');
-const getContentUrl = require('./getContentUrl');
-const defaultOptions = require('./defaultOptions');
-const negotiateStartReloadService = require('./negotiateStartReloadService');
 var _initialized = false;
 var _ccs;
 var _instanceOptions;
@@ -24,6 +14,9 @@ var isInstalling = false;
  */
 function initialize(instanceOptions = {}) {
 	return new Promise((resolve) => {
+		const negotiateStartReloadService = require('./negotiateStartReloadService');
+		const defaultOptions = require('./defaultOptions');
+
 		// fetch ccs config from localStorage if not fetched before
 		_ccs = _ccs || JSON.parse(localStorage.ccs || JSON.stringify({}));
 
@@ -56,32 +49,42 @@ function initialize(instanceOptions = {}) {
  * @return {Promise}		- Resolves with download function, rejects with error.
  */
 function lookForUpdates(url, options = {}) {
-	if (!_initialized) {
-		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
-	}
+	return new Promise((resolve, reject) => {
+		const urlJoin = require('url-join');
+		const request = require('./request');
+		const parseResponseToObject = require('./parseResponseToObject');
+		const compareWithCurrentVersion = require('./compareWithCurrentVersion');
+		const getContentUrl = require('./getContentUrl');
+		const defaultOptions = require('./defaultOptions');
 
-	if (isLookingForUpdates) {
-		return Promise.reject(new Error('cordova-code-swap: .lookForUpdates is already running.'));
-	}
+		if (!_initialized) {
+			reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
+		}
 
-	options = Object.assign({}, defaultOptions.update, options);
-	const updateDeclaration = urlJoin(url, 'chcp.json');
-	isLookingForUpdates = true;
+		if (isLookingForUpdates) {
+			reject(new Error('cordova-code-swap: .lookForUpdates is already running.'));
+		}
 
-	return request.get(updateDeclaration, { headers: options.headers })
-		.then(parseResponseToObject)
-		.then(updateInfo => compareWithCurrentVersion(_ccs, updateInfo))
-		.then(updateInfo => {
-			updateInfo.content_url = getContentUrl(url, updateInfo);
-			var downloadFunction = _download.bind(null, updateInfo, options);
-			downloadFunction.updateInfo = updateInfo;
-			isLookingForUpdates = false;
-			return downloadFunction;
-		})
-		.catch(err => {
-			isLookingForUpdates = false;
-			throw err;
-		});
+		options = Object.assign({}, defaultOptions.update, options);
+		const updateDeclaration = urlJoin(url, 'chcp.json');
+		isLookingForUpdates = true;
+
+		request.get(updateDeclaration, { headers: options.headers })
+			.then(parseResponseToObject)
+			.then(updateInfo => compareWithCurrentVersion(_ccs, updateInfo))
+			.then(updateInfo => {
+				updateInfo.content_url = getContentUrl(url, updateInfo);
+
+				var downloadFunction = _download.bind(null, updateInfo, options);
+				downloadFunction.updateInfo = updateInfo;
+				isLookingForUpdates = false;
+				resolve(downloadFunction);
+			})
+			.catch(err => {
+				isLookingForUpdates = false;
+				reject(err);
+			});
+	});
 }
 
 /**
@@ -91,38 +94,47 @@ function lookForUpdates(url, options = {}) {
  * @return {Promise}			- Resolves with install function, rejects with error
  */
 function _download(updateInfo, options) {
-	if (isDownloading) {
-		throw new Error('cordova-code-swap: A download is already in progress.');
-	}
+	return new Promise((resolve, reject) => {
+		const urlJoin = require('url-join');
+		const fetchFiles = require('./fetchFiles');
+		const getCopyAndDownloadList = require('./getCopyAndDownloadList');
+		const parseResponseToObject = require('./parseResponseToObject');
+		const request = require('./request');
 
-	// make a local copy of updateInfo so it can be mutated
-	let updateInfoClone = Object.assign({}, updateInfo);
-	isDownloading = true;
+		if (isDownloading) {
+			reject(new Error('cordova-code-swap: A download is already in progress.'));
+		}
 
-	var contentUrl = updateInfoClone.content_url;
-	var manifestUrl = urlJoin(contentUrl, 'chcp.manifest');
-	return request.get(manifestUrl, { headers: options.headers })
-		.then(parseResponseToObject)
-		.then(serverManifest => {
-			updateInfoClone.manifest = serverManifest;
-			return getCopyAndDownloadList(_ccs.manifest, serverManifest);
-		})
-		.then(fetchList => fetchFiles(_ccs, fetchList, updateInfoClone, options, _instanceOptions))
-		.then(() => {
-			_ccs.pendingInstallation = {};
-			_ccs.pendingInstallation.updateInfo = updateInfoClone;
-			_ccs.pendingInstallation.options = options;
-			localStorage.ccs = JSON.stringify(_ccs);
+		// make a local copy of updateInfo so it can be mutated
+		let updateInfoClone = Object.assign({}, updateInfo);
+		isDownloading = true;
 
-			isDownloading = false;
-			return _install.bind(null, updateInfoClone, options);
-		})
-		.catch(err => {
-			_ccs.pendingInstallation = false;
-			isDownloading = false;
-			localStorage.ccs = JSON.stringify(_ccs);
-			throw err;
-		});
+		var contentUrl = updateInfoClone.content_url;
+		var manifestUrl = urlJoin(contentUrl, 'chcp.manifest');
+
+		request.get(manifestUrl, { headers: options.headers })
+			.then(parseResponseToObject)
+			.then(serverManifest => {
+				updateInfoClone.manifest = serverManifest;
+				return getCopyAndDownloadList(_ccs.manifest, serverManifest);
+			})
+			.then(fetchList => fetchFiles(_ccs, fetchList, updateInfoClone, options, _instanceOptions))
+			.then(() => {
+				_ccs.pendingInstallation = {};
+				_ccs.pendingInstallation.updateInfo = updateInfoClone;
+				_ccs.pendingInstallation.options = options;
+				localStorage.ccs = JSON.stringify(_ccs);
+
+				isDownloading = false;
+				resolve(_install.bind(null, updateInfoClone, options));
+			})
+			.catch(err => {
+				_ccs.pendingInstallation = false;
+				isDownloading = false;
+				localStorage.ccs = JSON.stringify(_ccs);
+				reject(err);
+			});
+	});
 }
 
 /**
@@ -132,30 +144,45 @@ function _download(updateInfo, options) {
  * @return {Promise}
  */
 function _install(updateInfo, options) {
-	if (isInstalling) {
-		Promise.reject('cordova-code-swap: An installation is already in progress');
-	}
-	const deleteBackups = require('./deleteBackups');
-	isInstalling = true;
+	return new Promise((resolve, reject) => {
+		const updateCCSConfig = require('./updateCCSConfig');
+		const deleteBackups = require('./deleteBackups');
+		
+		if (isInstalling) {
+			reject('cordova-code-swap: An installation is already in progress');
+		} else {
+			isInstalling = true;
+		}
 
-	// create new config with settings needed to load the newly installed version
-	_ccs = updateCCSConfig(_ccs, updateInfo, options, _instanceOptions);
+		// create new config with settings needed to load the newly installed version
+		_ccs = updateCCSConfig(_ccs, updateInfo, options, _instanceOptions);
 
-	// find obsolete backups
-	let sortedBackups = _ccs.backups.sort((b1, b2) => b1.timestamp || 0 < b2.timestamp || 0);
-	let backupsToDelete = sortedBackups.slice(_instanceOptions.backupCount, sortedBackups.length);
+		// find obsolete backups
+		let sortedBackups = _ccs.backups.sort((b1, b2) => b1.timestamp || 0 < b2.timestamp || 0);
+		let backupsToDelete = sortedBackups.slice(_instanceOptions.backupCount, sortedBackups.length);
 
-	// update the current the backup list
-	_ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
+		// update the current the backup list
+		_ccs.backups = sortedBackups.slice(0, _instanceOptions.backupCount);
 
-	return Promise.resolve()
-		.then(() => _instanceOptions.debug.preserveBreakpoints ? null : deleteBackups(backupsToDelete))
-		.then(() => { localStorage.ccs = JSON.stringify(_ccs); })
-		.then(
-			() => { isInstalling = false; },
-			err => { isInstalling = false; throw err; }
-		)
-		.then(() => (_instanceOptions.debug.preserveBreakpoints && !_instanceOptions.iframe) ? new Promise(() => window.location.reload()) : initialize());
+		Promise.resolve()
+			.then(() => _instanceOptions.debug.preserveBreakpoints ? null : deleteBackups(backupsToDelete))
+			.then(() => { localStorage.ccs = JSON.stringify(_ccs); })
+			.then(
+				() => { isInstalling = false; },
+				err => {
+					isInstalling = false;
+					throw err;
+				}
+			)
+			.then(() => {
+				if (_instanceOptions.debug.preserveBreakpoints && !_instanceOptions.iframe) {
+					window.location.reload();
+				} else {
+					resolve(initialize());
+				}
+			})
+			.catch(err => reject(err));
+	});
 }
 
 /**
