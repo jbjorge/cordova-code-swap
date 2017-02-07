@@ -44,7 +44,8 @@ function initialize(instanceOptions = {}) {
 		} else {
 			resolve();
 		}
-	});
+	})
+	.timeout(5000, 'cordova-code-swap: .initialize() failed to run.');
 }
 
 /**
