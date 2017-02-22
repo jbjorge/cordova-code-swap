@@ -16,10 +16,10 @@ function createWebSocketServer(contentUrl, outputFolder) {
 	app.use(express.static(assetsFolder));
 
 	io.on('connection', socket => {
-		console.log(chalk.green('A user connected'));
+		console.log(chalk.green('[CCS]: A user connected'));
 
 		socket.on('disconnect', () => {
-			console.log(chalk.yellow('A user disconnected'));
+			console.log(chalk.yellow('[CCS]: A user disconnected'));
 		});
 	});
 
@@ -29,8 +29,8 @@ function createWebSocketServer(contentUrl, outputFolder) {
 				return reject(err);
 			}
 
-			console.log(chalk.gray('Reload server is running on port', port));
-			console.log(chalk.gray('Serving files from', assetsFolder));
+			console.log(chalk.gray('[CCS]: Reload server is running on port', port));
+			console.log(chalk.gray('[CCS]: Serving files from', assetsFolder));
 			resolve(io);
 		});
 	});

@@ -19,7 +19,7 @@ program
 	.option('-i, --input <glob>', 'comma separated files to include in manifest', args => args.split(','))
 	.option('-o, --output <folder>', 'folder to create the manifest file in')
 	.option('-r, --replace <a,b>', 'replace "a" with "b" in the manifest file paths', args => args.split(','))
-	.option('-c, --config <JSON>', 'a stringified JSON-object that will be joined with the generated chcp.json')
+	.option('-c, --config <JSON>', 'a stringified JSON-object that will be merged with the generated chcp.json')
 	.option('-d, --dev <ip[:port]>', 'watch files and update manifest automatically, starts a static file server that the app can fetch updates from')
 	.option('-a, --autoUpdate', 'tell the app to update when the manifest updates')
 	.parse(process.argv);
@@ -38,7 +38,7 @@ figlet(program.dev ? 'CCS dev' : 'CCS production', (err, data) => {
 	createCCSFiles(program.input, program.output, ccsOptions)
 		.then(emitUpdateNotification => {
 			if (program.dev && !program.autoUpdate) {
-				console.log(chalk.blue('Force the app to update by typing "up" in this terminal'));
+				console.log(chalk.blue('[CCS]: Force the app to update by typing "re" in this terminal'));
 				const readline = require('readline');
 				const rl = readline.createInterface({ input: process.stdin });
 				rl.on('line', input => {

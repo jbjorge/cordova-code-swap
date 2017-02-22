@@ -19,7 +19,7 @@ function createCCSFiles(inputGlob, outputFolder, options = {}) {
 					.then(() => createCHCP(outputFolder, devConfig))
 					.then(() => {
 						if (options.autoUpdate) {
-							console.log(chalk.gray('Telling app to look for updates and install.'));
+							console.log(chalk.gray('[CCS]: Telling app to look for updates and install.'));
 							socketServer.emit('updateCCS');
 						}
 					})
@@ -38,7 +38,7 @@ function createCCSFiles(inputGlob, outputFolder, options = {}) {
 
 function createUpdateEmitter(socketServer) {
 	return function(){
-		console.log(chalk.gray('Telling app to look for updates and install.'));
+		console.log(chalk.gray('[CCS]: Telling app to look for updates and install.'));
 		socketServer.emit('updateCCS');
 	};
 }

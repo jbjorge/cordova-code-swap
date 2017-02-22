@@ -192,7 +192,7 @@ function _install(updateInfo, options) {
  */
 function install() {
 	if (!_initialized) {
-		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
+		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before installing. It should be the first thing to be run in the application.'));
 	}
 	if (_ccs.pendingInstallation) {
 		return _install(_ccs.pendingInstallation.updateInfo, _ccs.pendingInstallation.options);
