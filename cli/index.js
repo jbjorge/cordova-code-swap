@@ -42,7 +42,7 @@ figlet(program.dev ? 'CCS dev' : 'CCS production', (err, data) => {
 				const readline = require('readline');
 				const rl = readline.createInterface({ input: process.stdin });
 				rl.on('line', input => {
-					if (input == 'up') {
+					if (input == 're') {
 						emitUpdateNotification();
 					}
 				});
