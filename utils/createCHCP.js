@@ -4,7 +4,7 @@ const path = require('path');
 function createCHCP(outputFolder, config = {}) {
 	const defaultConfig = {
 		content_url: '/',
-		release: Date.now()
+		release: Date.now().toString()
 	};
 	const filePath = path.join(outputFolder, 'chcp.json');
 	config = Object.assign({}, defaultConfig, config);
