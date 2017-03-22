@@ -71,6 +71,11 @@ function lookForUpdates(url, options = {}) {
 
 		request.get(updateDeclaration, { headers: options.headers })
 			.then(parseResponseToObject)
+			.then(updateInfo => {
+				// ensure release prop is a string
+				updateInfo.release = updateInfo.release.toString();
+				return updateInfo;
+			})
 			.then(updateInfo => compareWithCurrentVersion(_ccs, updateInfo))
 			.then(updateInfo => {
 				updateInfo.content_url = getContentUrl(url, updateInfo);
