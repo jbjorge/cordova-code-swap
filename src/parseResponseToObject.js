@@ -1,5 +1,7 @@
 function parseResponseToObject(response) {
-	return JSON.parse(response);
+	const parsed = JSON.parse(response);
+	parsed.release = parsed.release.toString();
+	return parsed;
 }
 
 module.exports = parseResponseToObject;

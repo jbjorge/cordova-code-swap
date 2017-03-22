@@ -1,7 +1,9 @@
 "use strict";
 
 function parseResponseToObject(response) {
-	return JSON.parse(response);
+	var parsed = JSON.parse(response);
+	parsed.release = parsed.release.toString();
+	return parsed;
 }
 
 module.exports = parseResponseToObject;
