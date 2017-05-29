@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "build": "run-s lint build:clean build:js",
+    "build": "run-s lint test build:clean build:js",
     "build:js": "babel src --out-dir build --plugins transform-object-assign --presets=es2015",
     "build:clean": "mkdir -p build && rm -r build/*",
     "lint": "eslint src/*",
