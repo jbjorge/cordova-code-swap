@@ -8,11 +8,13 @@
     "url": "https://github.com/jbjorge/cordova-code-swap.git"
   },
   "scripts": {
+    "test": "mocha",
     "build": "run-s lint build:clean build:js",
     "build:js": "babel src --out-dir build --plugins transform-object-assign --presets=es2015",
     "build:clean": "mkdir -p build && rm -r build/*",
     "lint": "eslint src/*",
-    "ci": "nodemon --watch ./src --exec 'npm run build'"
+    "ci": "nodemon --watch ./src --exec 'npm run build'",
+    "ci-test": "nodemon --exec 'npm run test'"
   },
   "keywords": [],
   "author": "Joachim Bjørge <jb@ground.no> (http://ground.no)",
