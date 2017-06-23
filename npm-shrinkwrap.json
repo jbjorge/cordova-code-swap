@@ -1023,6 +1023,12 @@
       "from": "filenamify@>=1.2.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/filenamify/-/filenamify-1.2.1.tgz"
     },
+    "fill-keys": {
+      "version": "1.0.2",
+      "from": "fill-keys@>=1.0.2 <2.0.0",
+      "resolved": "https://registry.npmjs.org/fill-keys/-/fill-keys-1.0.2.tgz",
+      "dev": true
+    },
     "fill-range": {
       "version": "2.2.3",
       "from": "fill-range@>=2.1.0 <3.0.0",
@@ -1373,6 +1379,12 @@
       "version": "2.1.0",
       "from": "is-number@>=2.1.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/is-number/-/is-number-2.1.0.tgz"
+    },
+    "is-object": {
+      "version": "1.0.1",
+      "from": "is-object@>=1.0.1 <1.1.0",
+      "resolved": "https://registry.npmjs.org/is-object/-/is-object-1.0.1.tgz",
+      "dev": true
     },
     "is-path-cwd": {
       "version": "1.0.0",
@@ -1739,6 +1751,12 @@
         }
       }
     },
+    "module-not-found-error": {
+      "version": "1.0.1",
+      "from": "module-not-found-error@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/module-not-found-error/-/module-not-found-error-1.0.1.tgz",
+      "dev": true
+    },
     "ms": {
       "version": "2.0.0",
       "from": "ms@2.0.0",
@@ -2032,6 +2050,20 @@
       "version": "1.1.4",
       "from": "proxy-addr@>=1.1.4 <1.2.0",
       "resolved": "https://registry.npmjs.org/proxy-addr/-/proxy-addr-1.1.4.tgz"
+    },
+    "proxyquire": {
+      "version": "1.8.0",
+      "from": "proxyquire@latest",
+      "resolved": "https://registry.npmjs.org/proxyquire/-/proxyquire-1.8.0.tgz",
+      "dev": true,
+      "dependencies": {
+        "resolve": {
+          "version": "1.1.7",
+          "from": "resolve@>=1.1.7 <1.2.0",
+          "resolved": "https://registry.npmjs.org/resolve/-/resolve-1.1.7.tgz",
+          "dev": true
+        }
+      }
     },
     "ps-tree": {
       "version": "1.1.0",
