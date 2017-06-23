@@ -1,5 +1,5 @@
-const getFileSystem = require('./getFileSystem');
-const getFolder = require('./getFolder');
+const getFileSystem = require('../shared/getFileSystem');
+const getFolder = require('../shared/getFolder');
 const getFile = require('./getFile');
 const Promise = require('bluebird');
 const createFoldersInPath = require('./createFoldersInPath');

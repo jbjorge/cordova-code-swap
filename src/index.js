@@ -8,7 +8,7 @@ const lookForUpdates = require('./lookForUpdates');
  * @return {Promise}
  */
 function install() {
-	const state = require('./state');
+	const state = require('./shared/state');
 	const _install = require('./install');
 	const ccsConfig = state.get('ccs');
 	if (!state.get('initialized')) {

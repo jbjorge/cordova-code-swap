@@ -7,11 +7,11 @@
 module.exports = function(updateInfo, options) {
 	return new Promise((resolve, reject) => {
 		const urlJoin = require('url-join');
-		const fetchFiles = require('./fetchFiles');
-		const getCopyAndDownloadList = require('./getCopyAndDownloadList');
-		const parseResponseToObject = require('./parseResponseToObject');
-		const request = require('./request');
-		const state = require('./state');
+		const fetchFiles = require('./download/fetchFiles');
+		const getCopyAndDownloadList = require('./download/getCopyAndDownloadList');
+		const parseResponseToObject = require('./shared/parseResponseToObject');
+		const request = require('./shared/request');
+		const state = require('./shared/state');
 		const ccsConfig = state.get('ccs');
 		const instanceOptions = state.get('instanceOptions');
 		const install = require('./install');
@@ -50,4 +50,4 @@ module.exports = function(updateInfo, options) {
 				reject(err);
 			});
 	});
-}
+};

@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
-const getFileSystem = require('./getFileSystem');
-const getFolder = require('./getFolder');
+const getFileSystem = require('../shared/getFileSystem');
+const getFolder = require('../shared/getFolder');
 
 /**
  * Loops over all folders in a path and creates them

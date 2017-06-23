@@ -7,13 +7,13 @@
  */
 module.exports = function(url, options = {}) {
 	return new Promise((resolve, reject) => {
-		const state = require('./state');
+		const state = require('./shared/state');
 		const urlJoin = require('url-join');
-		const request = require('./request');
-		const parseResponseToObject = require('./parseResponseToObject');
-		const compareWithCurrentVersion = require('./compareWithCurrentVersion');
-		const getContentUrl = require('./getContentUrl');
-		const defaultOptions = require('./defaultOptions');
+		const request = require('./shared/request');
+		const parseResponseToObject = require('./shared/parseResponseToObject');
+		const compareWithCurrentVersion = require('./lookForUpdates/compareWithCurrentVersion');
+		const getContentUrl = require('./lookForUpdates/getContentUrl');
+		const defaultOptions = require('./shared/defaultOptions');
 		const download = require('./download');
 
 		if (!state.get('initialized')) {

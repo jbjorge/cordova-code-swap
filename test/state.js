@@ -1,5 +1,5 @@
 const proxyquire = require('proxyquire');
-const sut = proxyquire('../src/state', {
+const sut = proxyquire('../src/shared/state', {
 	'./getConfig': () => {}
 });
 const assert = require('assert');

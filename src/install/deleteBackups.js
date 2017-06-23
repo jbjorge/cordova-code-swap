@@ -1,6 +1,6 @@
-const getFileSystem = require('./getFileSystem');
+const getFileSystem = require('../shared/getFileSystem');
 const deleteFolder = require('./deleteFolder');
-const getFolder = require('./getFolder');
+const getFolder = require('../shared/getFolder');
 const sanitizeFolder = require('filenamify');
 const Promise = require('bluebird');
 

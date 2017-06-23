@@ -1,5 +1,5 @@
 const assert = require('assert');
-const getContentUrl = require('../src/getContentUrl');
+const getContentUrl = require('../src/lookForUpdates/getContentUrl');
 const serverUrl = 'http://example.com';
 const sut = getContentUrl.bind(null, serverUrl);
 

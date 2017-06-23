@@ -6,9 +6,9 @@
  */
 module.exports = function(updateInfo, options) {
 	return new Promise((resolve, reject) => {
-		const updateCCSConfig = require('./updateCCSConfig');
-		const deleteBackups = require('./deleteBackups');
-		const state = require('./state');
+		const updateCCSConfig = require('./install/updateCCSConfig');
+		const deleteBackups = require('./install/deleteBackups');
+		const state = require('./shared/state');
 		const ccsConfig = state.get('ccs');
 		const instanceOptions = state.get('instanceOptions');
 		const initialize = require('./initialize');
@@ -48,4 +48,4 @@ module.exports = function(updateInfo, options) {
 			})
 			.catch(err => reject(err));
 	});
-}
+};

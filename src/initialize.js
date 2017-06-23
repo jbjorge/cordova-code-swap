@@ -7,9 +7,9 @@ const Promise = require('bluebird');
  */
 module.exports = (instanceOptions) => {
 	return new Promise((resolve) => {
-		const state = require('./state');
+		const state = require('./shared/state');
 		const negotiateStartReloadService = require('./initialize/negotiateStartReloadService');
-		const defaultOptions = require('./defaultOptions');
+		const defaultOptions = require('./shared/defaultOptions');
 		const lookForUpdates = require('./lookForUpdates');
 		const ccsConfig = state.get('ccs');
 		const isInitialized = state.get('initialized');
