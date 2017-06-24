@@ -510,6 +510,12 @@
       "resolved": "https://registry.npmjs.org/builtin-modules/-/builtin-modules-1.1.1.tgz",
       "dev": true
     },
+    "caller-id": {
+      "version": "0.1.0",
+      "from": "caller-id@>=0.1.0 <0.2.0",
+      "resolved": "https://registry.npmjs.org/caller-id/-/caller-id-0.1.0.tgz",
+      "dev": true
+    },
     "caller-path": {
       "version": "0.1.0",
       "from": "caller-path@>=0.1.0 <0.2.0",
@@ -1751,6 +1757,12 @@
         }
       }
     },
+    "mock-require": {
+      "version": "2.0.2",
+      "from": "mock-require@latest",
+      "resolved": "https://registry.npmjs.org/mock-require/-/mock-require-2.0.2.tgz",
+      "dev": true
+    },
     "module-not-found-error": {
       "version": "1.0.1",
       "from": "module-not-found-error@>=1.0.0 <2.0.0",
@@ -2454,6 +2466,12 @@
       "version": "1.0.3",
       "from": "sprintf-js@>=1.0.2 <1.1.0",
       "resolved": "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz",
+      "dev": true
+    },
+    "stack-trace": {
+      "version": "0.0.10",
+      "from": "stack-trace@>=0.0.7 <0.1.0",
+      "resolved": "https://registry.npmjs.org/stack-trace/-/stack-trace-0.0.10.tgz",
       "dev": true
     },
     "statuses": {
