@@ -23,7 +23,7 @@ context('public functions', () => {
 
 	it('should expose install', () => {
 		assert(typeof sut.install == 'function');
-	})
+	});
 });
 
 context('install', () => {
@@ -64,7 +64,7 @@ context('install', () => {
 		mock('./install', function(updateInfo, options) {
 			assert.equal(updateInfo, pendingInstallation.updateInfo);
 			assert.equal(options, pendingInstallation.options);
-		})
+		});
 		return sut.install();
 	});
 
