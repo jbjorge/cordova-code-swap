@@ -1,8 +1,8 @@
 'use strict';
 
-var getFileSystem = require('./getFileSystem');
+var getFileSystem = require('../shared/getFileSystem');
 var deleteFolder = require('./deleteFolder');
-var getFolder = require('./getFolder');
+var getFolder = require('../shared/getFolder');
 var sanitizeFolder = require('filenamify');
 var Promise = require('bluebird');
 

@@ -1,8 +1,8 @@
 'use strict';
 
 var Promise = require('bluebird');
-var getFileSystem = require('./getFileSystem');
-var getFolder = require('./getFolder');
+var getFileSystem = require('../shared/getFileSystem');
+var getFolder = require('../shared/getFolder');
 
 /**
  * Loops over all folders in a path and creates them
