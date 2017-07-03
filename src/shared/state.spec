@@ -5,11 +5,17 @@ const sut = proxyquire('./state', {
 const assert = require('assert');
 const testState1 = true;
 const testState2 = { test: 'data' };
+const testState3 = 'testState3';
 
 it('should be able to set state', () => {
 	sut.set('initialized', testState1);
 	sut.set('ccs', testState2);
 });
+
+it('should return the new state when setting state', () => {
+	const actual = sut.set('instanceOptions', testState3);
+	assert.equal(actual, testState3);
+})
 
 it('should throw an error when setting an undeclared state', () => {
 	const crashingFunc = () => sut.set('lolface', testState1);

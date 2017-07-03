@@ -13,6 +13,7 @@ exports.set = (name, value) => {
 		throw new Error('Tried assigning value to undeclared property');
 	}
 	state[name] = value;
+	return state[name];
 };
 
 exports.get = name => state[name];
