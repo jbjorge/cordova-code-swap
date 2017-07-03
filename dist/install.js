@@ -11,9 +11,9 @@ module.exports = function (updateInfo, options) {
 		var updateCCSConfig = require('./install/updateCCSConfig');
 		var deleteBackups = require('./install/deleteBackups');
 		var state = require('./shared/state');
-		var ccsConfig = state.get('ccs');
 		var instanceOptions = state.get('instanceOptions');
 		var initialize = require('./initialize');
+		var ccsConfig = state.get('ccs');
 
 		if (state.get('isInstalling')) {
 			reject('cordova-code-swap: An installation is already in progress');
@@ -22,7 +22,7 @@ module.exports = function (updateInfo, options) {
 		}
 
 		// create new config with settings needed to load the newly installed version
-		state.set('ccs', updateCCSConfig(ccsConfig, updateInfo, options, instanceOptions));
+		ccsConfig = state.set('ccs', updateCCSConfig(ccsConfig, updateInfo, options, instanceOptions));
 
 		// find obsolete backups
 		var sortedBackups = ccsConfig.backups.sort(function (b1, b2) {

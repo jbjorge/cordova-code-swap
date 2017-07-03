@@ -15,6 +15,7 @@ exports.set = function (name, value) {
 		throw new Error('Tried assigning value to undeclared property');
 	}
 	state[name] = value;
+	return state[name];
 };
 
 exports.get = function (name) {
