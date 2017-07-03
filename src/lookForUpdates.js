@@ -16,6 +16,10 @@ module.exports = function(url, options = {}) {
 		const defaultOptions = require('./shared/defaultOptions');
 		const download = require('./download');
 
+		if (!url) {
+			reject(new Error('cordova-code-swap: No url was supplied when using .lookForUpdates'));
+		}
+
 		if (!state.get('initialized')) {
 			reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
 		}

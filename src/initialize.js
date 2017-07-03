@@ -5,7 +5,7 @@ const Promise = require('bluebird');
  * @param {Object} instanceOptions - Options to use for the instance.
  * @return {Promise}
  */
-module.exports = (instanceOptions) => {
+module.exports = (instanceOptions = {}) => {
 	return new Promise((resolve) => {
 		const state = require('./shared/state');
 		const negotiateStartReloadService = require('./initialize/negotiateStartReloadService');
