@@ -15,7 +15,7 @@ module.exports = (instanceOptions = {}) => {
 		const isInitialized = state.get('initialized');
 
 		if (!isInitialized) {
-			state.set('instanceOptions', Object.assign({}, defaultOptions.instance, instanceOptions));
+			instanceOptions = state.set('instanceOptions', Object.assign({}, defaultOptions.instance, instanceOptions));
 			state.set('initialized', true);
 			negotiateStartReloadService(instanceOptions.debug, lookForUpdates);
 		}
