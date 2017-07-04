@@ -21,7 +21,7 @@ module.exports = function () {
 		var isInitialized = state.get('initialized');
 
 		if (!isInitialized) {
-			state.set('instanceOptions', _extends({}, defaultOptions.instance, instanceOptions));
+			instanceOptions = state.set('instanceOptions', _extends({}, defaultOptions.instance, instanceOptions));
 			state.set('initialized', true);
 			negotiateStartReloadService(instanceOptions.debug, lookForUpdates);
 		}
