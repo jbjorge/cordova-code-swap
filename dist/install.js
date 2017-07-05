@@ -46,7 +46,7 @@ module.exports = function (updateInfo, options) {
 			if (instanceOptions.debug.preserveBreakpoints && !instanceOptions.iframe) {
 				window.location.reload();
 			} else {
-				resolve(initialize());
+				resolve(initialize(instanceOptions));
 			}
 		}).catch(function (err) {
 			return reject(err);
