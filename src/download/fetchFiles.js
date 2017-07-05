@@ -27,7 +27,12 @@ function fetchFiles(ccs, { filesToCopy, filesToDownload }, versionInfo, options,
 			}
 			return copyExistingFiles(dataDir, versionFolderName, filesToCopy, destinationFolderName)
 				.catch(() => downloadFiles(contentUrl, filesToCopy, destinationFolderName, options))
-				.then(() => copyCordovaFiles(dataDir, destinationFolderName));
+				.then(() => {
+					if (instanceOptions.iframe) {
+						return;
+					}
+					return copyCordovaFiles(dataDir, destinationFolderName);
+				});
 		})
 		.then(() => downloadFiles(contentUrl, filesToDownload, destinationFolderName, options));
 }
