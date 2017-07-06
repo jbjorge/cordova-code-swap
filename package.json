@@ -14,7 +14,7 @@
     "build:clean": "mkdir -p ./dist && rm -r dist/*",
     "lint": "eslint src/* utils/* cli/*",
     "ci": "nodemon --watch ./src --exec 'npm run build'",
-    "ci-test": "nodemon -e js,json,spec --exec 'npm run test' --watch ./src"
+    "ci-test": "nodemon -e js,json,spec --exec 'npm run test' --watch ./src --watch ./utils"
   },
   "bin": {
     "ccs": "./cli/index.js"
