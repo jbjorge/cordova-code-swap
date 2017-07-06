@@ -3,7 +3,8 @@ module.exports = {
         "browser": true,
         "commonjs": true,
         "es6": true,
-        "mocha": true
+        "mocha": true,
+        "node": true
     },
     "globals": {
         "FileTransfer": true,
