@@ -15,7 +15,7 @@ var copyCordovaFiles = require('./copyCordovaFiles');
  * @param  {Object} options                 See calling function
  * @return {Promise}
  */
-function fetchFiles(ccs, _ref, versionInfo, options, instanceOptions) {
+function fetchFiles(ccs, _ref, versionInfo, options, instanceOptions, progressCallback) {
 	var filesToCopy = _ref.filesToCopy,
 	    filesToDownload = _ref.filesToDownload;
 
@@ -30,7 +30,7 @@ function fetchFiles(ccs, _ref, versionInfo, options, instanceOptions) {
 			return;
 		}
 		return copyExistingFiles(dataDir, versionFolderName, filesToCopy, destinationFolderName).catch(function () {
-			return downloadFiles(contentUrl, filesToCopy, destinationFolderName, options);
+			return downloadFiles(contentUrl, filesToCopy, destinationFolderName, options, progressCallback);
 		}).then(function () {
 			if (instanceOptions.iframe) {
 				return;
@@ -38,7 +38,7 @@ function fetchFiles(ccs, _ref, versionInfo, options, instanceOptions) {
 			return copyCordovaFiles(dataDir, destinationFolderName);
 		});
 	}).then(function () {
-		return downloadFiles(contentUrl, filesToDownload, destinationFolderName, options);
+		return downloadFiles(contentUrl, filesToDownload, destinationFolderName, options, progressCallback);
 	});
 }
 

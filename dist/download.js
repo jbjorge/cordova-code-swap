@@ -8,7 +8,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
  * @param  {Object} options     - Options to use when communicating with the server.
  * @return {Promise}			- Resolves with install function, rejects with error
  */
-module.exports = function (updateInfo, options) {
+module.exports = function (updateInfo, options, progressCallback) {
 	return new Promise(function (resolve, reject) {
 		var urlJoin = require('url-join');
 		var fetchFiles = require('./download/fetchFiles');
@@ -35,7 +35,7 @@ module.exports = function (updateInfo, options) {
 			updateInfoClone.manifest = serverManifest;
 			return getCopyAndDownloadList(ccsConfig.manifest, serverManifest);
 		}).then(function (fetchList) {
-			return fetchFiles(ccsConfig, fetchList, updateInfoClone, options, instanceOptions);
+			return fetchFiles(ccsConfig, fetchList, updateInfoClone, options, instanceOptions, progressCallback);
 		}).then(function () {
 			ccsConfig.pendingInstallation = {};
 			ccsConfig.pendingInstallation.updateInfo = updateInfoClone;
