@@ -169,6 +169,10 @@ var instanceOptions = {
 	}
 };
 
+function progressCallback(percentageAsInt, downloadedFileName) {
+    console.log(percentageAsInt + '% done', 'Downloaded ' + downloadedFileName);
+};
+
 document.addEventListener('deviceready', function(){
 	ccs.initialize(instanceOptions) // must always be run before anything else
       .then(function() {
@@ -179,7 +183,7 @@ document.addEventListener('deviceready', function(){
           if (download.updateInfo.min_native_interface > myNativeVersion) {
               throw new Error('Update received from the server requires newer native version of the app to be installed.');
           }
-          return download();
+          return download(progressCallback);
       })
       .catch(function(downloadErr) { /*handle the error*/ })
       .then(function(install) { return install() })

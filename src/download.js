@@ -4,7 +4,7 @@
  * @param  {Object} options     - Options to use when communicating with the server.
  * @return {Promise}			- Resolves with install function, rejects with error
  */
-module.exports = function(updateInfo, options) {
+module.exports = function(updateInfo, options, progressCallback) {
 	return new Promise((resolve, reject) => {
 		const urlJoin = require('url-join');
 		const fetchFiles = require('./download/fetchFiles');
@@ -33,7 +33,7 @@ module.exports = function(updateInfo, options) {
 				updateInfoClone.manifest = serverManifest;
 				return getCopyAndDownloadList(ccsConfig.manifest, serverManifest);
 			})
-			.then(fetchList => fetchFiles(ccsConfig, fetchList, updateInfoClone, options, instanceOptions))
+			.then(fetchList => fetchFiles(ccsConfig, fetchList, updateInfoClone, options, instanceOptions, progressCallback))
 			.then(() => {
 				ccsConfig.pendingInstallation = {};
 				ccsConfig.pendingInstallation.updateInfo = updateInfoClone;

@@ -9,15 +9,16 @@ const urlJoin = require('url-join');
  * @param  {Object} options					Can contain .headers to be sent with server requests when downloading
  * @return {Promise}
  */
-function downloadFiles(contentUrl, filesToDownload, destinationFolderName, options) {
-	const downloadPromises = [];
-	filesToDownload.forEach(fileToDownload => {
-		downloadPromises.push(downloadFile(contentUrl, fileToDownload, destinationFolderName, { headers: options.headers }));
+function downloadFiles(contentUrl, filesToDownload, destinationFolderName, options, progressCallback) {
+	progressCallback = progressCallback || function() {};
+	const onFileDoneCallback = onFileDone(filesToDownload.length, progressCallback);
+	const downloadPromises = filesToDownload.map(fileToDownload => {
+		return downloadFile(contentUrl, fileToDownload, destinationFolderName, { headers: options.headers }, onFileDoneCallback);
 	});
 	return Promise.all(downloadPromises);
 }
 
-function downloadFile(contentUrl, fileToDownload, destinationFolderName, options) {
+function downloadFile(contentUrl, fileToDownload, destinationFolderName, options, doneCallback) {
 	return createFoldersInPath(urlJoin(destinationFolderName, fileToDownload), { endsInFile: true })
 		.then(() => {
 			return new Promise((resolve, reject) => {
@@ -29,7 +30,10 @@ function downloadFile(contentUrl, fileToDownload, destinationFolderName, options
 				fileTransfer.download(
 					uri,
 					destinationPath,
-					resolve,
+					(args) => {
+						doneCallback(fileToDownload);
+						resolve(args);
+					},
 					error => reject(new Error('cordova-code-swap: ' + JSON.stringify(error))),
 					shouldTrustAllHosts,
 					options
@@ -37,6 +41,15 @@ function downloadFile(contentUrl, fileToDownload, destinationFolderName, options
 			});
 		});
 
+}
+
+function onFileDone(totalFilesCount, progressCallback) {
+	let fileDownloadedCount = 0;
+	return filename => {
+		fileDownloadedCount++;
+		const percentageAsInt = fileDownloadedCount / totalFilesCount * 100;
+		progressCallback(percentageAsInt, filename);
+	};
 }
 
 module.exports = downloadFiles;
