@@ -38,7 +38,7 @@ module.exports = function (url) {
 		var updateDeclaration = urlJoin(url, 'chcp.json');
 		state.set('isLookingForUpdates', true);
 
-		request.get(updateDeclaration, { headers: options.headers }).then(parseResponseToObject).then(function (updateInfo) {
+		request.get(updateDeclaration, { headers: options.headers, timeout: options.timeout }).then(parseResponseToObject).then(function (updateInfo) {
 			// ensure release prop is a string
 			updateInfo.release = updateInfo.release.toString();
 			return updateInfo;

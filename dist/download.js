@@ -31,7 +31,7 @@ module.exports = function (updateInfo, options, progressCallback) {
 		var contentUrl = updateInfoClone.content_url;
 		var manifestUrl = urlJoin(contentUrl, 'chcp.manifest');
 
-		request.get(manifestUrl, { headers: options.headers }).then(parseResponseToObject).then(function (serverManifest) {
+		request.get(manifestUrl, { headers: options.headers, timeout: options.timeout }).then(parseResponseToObject).then(function (serverManifest) {
 			updateInfoClone.manifest = serverManifest;
 			return getCopyAndDownloadList(ccsConfig.manifest, serverManifest);
 		}).then(function (fetchList) {

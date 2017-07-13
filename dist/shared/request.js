@@ -3,15 +3,16 @@
 var Promise = require('bluebird');
 
 function get(url) {
-	var headers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	return new Promise(function (resolve, reject) {
 		var xhr = new XMLHttpRequest();
 		var nonCachingUrl = url + '?_=' + new Date().getTime();
 		xhr.open('GET', nonCachingUrl, true);
+		xhr.timeout = options.timeout;
 
-		for (var headerName in headers) {
-			xhr.setRequestHeader(headerName, headers[headerName]);
+		for (var headerName in options.headers) {
+			xhr.setRequestHeader(headerName, options.headers[headerName]);
 		}
 
 		xhr.onload = function () {
