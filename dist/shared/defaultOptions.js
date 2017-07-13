@@ -3,7 +3,7 @@
 exports.update = {
 	entryFile: 'index.html',
 	headers: {
-		'User-Agent': 'Cordova-Code-Swap'
+		'x-request-from': 'cordova-code-swap'
 	},
 	timeout: 30000
 };
