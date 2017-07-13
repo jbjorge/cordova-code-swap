@@ -27,6 +27,9 @@ function get(url) {
 		xhr.onerror = function () {
 			reject(new Error('cordova-code-swap: Failed when fetching ' + url + '. The server responded with "' + xhr.statusText + '".'));
 		};
+		xhr.ontimeout = function () {
+			reject(new Error('cordova-code-swap: Failed when fetching ' + url + '. Got no response within the timeout of ' + options.timeout / 1000 + ' seconds'));
+		};
 		xhr.send(null);
 	});
 }
