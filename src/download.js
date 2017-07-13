@@ -27,7 +27,7 @@ module.exports = function(updateInfo, options, progressCallback) {
 		var contentUrl = updateInfoClone.content_url;
 		var manifestUrl = urlJoin(contentUrl, 'chcp.manifest');
 
-		request.get(manifestUrl, { headers: options.headers })
+		request.get(manifestUrl, { headers: options.headers, timeout: options.timeout })
 			.then(parseResponseToObject)
 			.then(serverManifest => {
 				updateInfoClone.manifest = serverManifest;

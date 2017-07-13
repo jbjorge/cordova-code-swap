@@ -143,7 +143,11 @@ var updateOptions = {
 	// Headers that will be sent with the requests to the update server
 	headers: {
 		key: value
-	}
+	},
+
+	// Timeout before it aborts requests to the update server in milliseconds.
+	// Default is 30 seconds.
+	timeout: 30000
 }
 ccs.lookForUpdates('http://example.com/', updateOptions);
 ```
@@ -157,7 +161,8 @@ var updateOptions = {
 	entryFile: 'index.html',
 	headers: {
 		'User-Agent': 'Cordova-Code-Swap'
-	}
+	},
+	timeout: 10000
 };
 var instanceOptions = {
 	backupCount: 1,

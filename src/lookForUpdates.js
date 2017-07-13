@@ -32,7 +32,7 @@ module.exports = function(url, options = {}) {
 		const updateDeclaration = urlJoin(url, 'chcp.json');
 		state.set('isLookingForUpdates', true);
 
-		request.get(updateDeclaration, { headers: options.headers })
+		request.get(updateDeclaration, { headers: options.headers, timeout: options.timeout })
 			.then(parseResponseToObject)
 			.then(updateInfo => {
 				// ensure release prop is a string
