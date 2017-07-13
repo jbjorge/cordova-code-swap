@@ -160,7 +160,7 @@ var myNativeVersion = getNativeVersionSomehow();
 var updateOptions = {
 	entryFile: 'index.html',
 	headers: {
-		'User-Agent': 'Cordova-Code-Swap'
+		'x-request-from': 'Cordova-Code-Swap'
 	},
 	timeout: 10000
 };
