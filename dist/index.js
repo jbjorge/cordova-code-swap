@@ -1,6 +1,8 @@
-const Promise = require('bluebird');
-const initialize = require('./initialize');
-const lookForUpdates = require('./lookForUpdates');
+'use strict';
+
+var Promise = require('bluebird');
+var initialize = require('./initialize');
+var lookForUpdates = require('./lookForUpdates');
 
 /**
  * PUBLIC
@@ -8,9 +10,9 @@ const lookForUpdates = require('./lookForUpdates');
  * @return {Promise}
  */
 function install() {
-	const state = require('./shared/state');
-	const _install = require('./install');
-	const ccsConfig = state.get('ccs');
+	var state = require('./shared/state');
+	var _install = require('./install');
+	var ccsConfig = state.get('ccs');
 	if (!state.get('initialized')) {
 		return Promise.reject(new Error('cordova-code-swap: .initialize() needs to be run before installing. It should be the first thing to be run in the application.'));
 	}
@@ -21,4 +23,4 @@ function install() {
 	}
 }
 
-module.exports = { initialize, lookForUpdates, install };
+module.exports = { initialize: initialize, lookForUpdates: lookForUpdates, install: install };

@@ -1,3 +1,4 @@
 node_modules
 .vscode
+chcp.manifest
 npm-debug.log
