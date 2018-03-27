@@ -11,6 +11,7 @@ module.exports = function(updateInfo, options) {
 		const state = require('./shared/state');
 		const instanceOptions = state.get('instanceOptions');
 		const initialize = require('./initialize');
+		const { sort } = require('../utils');
 		let ccsConfig = state.get('ccs');
 
 		if (state.get('isInstalling')) {
@@ -23,7 +24,7 @@ module.exports = function(updateInfo, options) {
 		ccsConfig = state.set('ccs', updateCCSConfig(ccsConfig, updateInfo, options, instanceOptions));
 
 		// find obsolete backups
-		let sortedBackups = ccsConfig.backups.sort((b1, b2) => b1.timestamp || 0 < b2.timestamp || 0);
+		let sortedBackups = sort.descending(ccsConfig.backups, 'timestamp');
 		let backupsToDelete = sortedBackups.slice(instanceOptions.backupCount, sortedBackups.length);
 
 		// update the current the backup list
