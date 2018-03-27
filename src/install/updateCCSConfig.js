@@ -18,7 +18,7 @@ function updateCCSConfig(ccs, updateInfo, options, instanceOptions) {
 	ccsCopy.release = instanceOptions.debug.preserveBreakpoints ? 'ccsDebug' : updateInfo.release;
 	ccsCopy.manifest = updateInfo.manifest;
 	ccsCopy.timestamp = Date.now();
-	ccsCopy.entryPoint = cordova.file.dataDirectory + sanitizeFolder(ccsCopy.release) + '/' + options.entryFile;
+	ccsCopy.entryPoint = sanitizeFolder(ccsCopy.release) + '/' + options.entryFile;
 
 	return ccsCopy;
 }
