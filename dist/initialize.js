@@ -16,6 +16,7 @@ module.exports = function () {
 		var state = require('./shared/state');
 		var negotiateStartReloadService = require('./initialize/negotiateStartReloadService');
 		var defaultOptions = require('./shared/defaultOptions');
+		var getEntryPointPath = require('./shared/getEntryPointPath');
 		var lookForUpdates = require('./lookForUpdates');
 		var ccsConfig = state.get('ccs');
 		var isInitialized = state.get('initialized');
@@ -26,11 +27,12 @@ module.exports = function () {
 			negotiateStartReloadService(instanceOptions.debug, lookForUpdates);
 		}
 
-		if (ccsConfig.entryPoint) {
+		var entryPoint = getEntryPointPath(ccsConfig.entryPoint, ccsConfig.release);
+		if (entryPoint) {
 			if (instanceOptions.iframe) {
-				resolve(ccsConfig.entryPoint);
-			} else if (ccsConfig.entryPoint !== window.location.href) {
-				window.location.href = ccsConfig.entryPoint;
+				resolve(entryPoint);
+			} else if (entryPoint !== window.location.href) {
+				window.location.href = entryPoint;
 			} else {
 				resolve();
 			}

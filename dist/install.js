@@ -13,6 +13,10 @@ module.exports = function (updateInfo, options) {
 		var state = require('./shared/state');
 		var instanceOptions = state.get('instanceOptions');
 		var initialize = require('./initialize');
+
+		var _require = require('../utils'),
+		    sort = _require.sort;
+
 		var ccsConfig = state.get('ccs');
 
 		if (state.get('isInstalling')) {
@@ -25,9 +29,7 @@ module.exports = function (updateInfo, options) {
 		ccsConfig = state.set('ccs', updateCCSConfig(ccsConfig, updateInfo, options, instanceOptions));
 
 		// find obsolete backups
-		var sortedBackups = ccsConfig.backups.sort(function (b1, b2) {
-			return b1.timestamp || 0 < b2.timestamp || 0;
-		});
+		var sortedBackups = sort.descending(ccsConfig.backups, 'timestamp');
 		var backupsToDelete = sortedBackups.slice(instanceOptions.backupCount, sortedBackups.length);
 
 		// update the current the backup list
