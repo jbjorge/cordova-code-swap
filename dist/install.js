@@ -13,10 +13,7 @@ module.exports = function (updateInfo, options) {
 		var state = require('./shared/state');
 		var instanceOptions = state.get('instanceOptions');
 		var initialize = require('./initialize');
-
-		var _require = require('../utils'),
-		    sort = _require.sort;
-
+		var sort = require('../utils/sort');
 		var ccsConfig = state.get('ccs');
 
 		if (state.get('isInstalling')) {
