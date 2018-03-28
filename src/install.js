@@ -11,7 +11,7 @@ module.exports = function(updateInfo, options) {
 		const state = require('./shared/state');
 		const instanceOptions = state.get('instanceOptions');
 		const initialize = require('./initialize');
-		const sort = require('../utils/sort');
+		const sort = require('./shared/sort');
 		let ccsConfig = state.get('ccs');
 
 		if (state.get('isInstalling')) {
