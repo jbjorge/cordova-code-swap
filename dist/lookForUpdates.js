@@ -35,7 +35,7 @@ module.exports = function (url) {
 		}
 
 		options = _extends({}, defaultOptions.update, options);
-		var updateDeclaration = urlJoin(url, 'chcp.json');
+		var updateDeclaration = urlJoin(url, 'chcp.json?_=' + Date.now());
 		state.set('isLookingForUpdates', true);
 
 		request.get(updateDeclaration, { headers: options.headers, timeout: options.timeout }).then(parseResponseToObject).then(function (updateInfo) {
