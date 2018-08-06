@@ -23,7 +23,7 @@ function downloadFile(contentUrl, fileToDownload, destinationFolderName, options
 		.then(() => {
 			return new Promise((resolve, reject) => {
 				const fileTransfer = new FileTransfer();
-				const uri = encodeURI(urlJoin(contentUrl, fileToDownload));
+				const uri = encodeURI(urlJoin(contentUrl, fileToDownload) + '?_=' + Date.now());
 				const destinationPath = cordova.file.dataDirectory + destinationFolderName + '/' + fileToDownload;
 				const shouldTrustAllHosts = false;
 

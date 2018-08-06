@@ -29,7 +29,7 @@ module.exports = function(url, options = {}) {
 		}
 
 		options = Object.assign({}, defaultOptions.update, options);
-		const updateDeclaration = urlJoin(url, 'chcp.json');
+		const updateDeclaration = urlJoin(url, 'chcp.json?_=' + Date.now());
 		state.set('isLookingForUpdates', true);
 
 		request.get(updateDeclaration, { headers: options.headers, timeout: options.timeout })

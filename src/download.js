@@ -25,7 +25,7 @@ module.exports = function(updateInfo, options, progressCallback) {
 		state.set('isDownloading', true);
 
 		var contentUrl = updateInfoClone.content_url;
-		var manifestUrl = urlJoin(contentUrl, 'chcp.manifest');
+		var manifestUrl = urlJoin(contentUrl, 'chcp.manifest?_=' + Date.now());
 
 		request.get(manifestUrl, { headers: options.headers, timeout: options.timeout })
 			.then(parseResponseToObject)
