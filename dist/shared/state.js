@@ -1,6 +1,7 @@
 'use strict';
 
 var getConfig = require('./getConfig');
+var errors = require('./errors');
 var state = {
 	initialized: false,
 	ccs: getConfig(),
@@ -12,7 +13,7 @@ var state = {
 
 exports.set = function (name, value) {
 	if (!state.hasOwnProperty(name)) {
-		throw new Error('Tried assigning value to undeclared property');
+		throw errors.create(errors.CCS_INTERNAL, 'Tried assigning value to undeclared property');
 	}
 	state[name] = value;
 	return state[name];

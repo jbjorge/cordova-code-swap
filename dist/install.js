@@ -1,5 +1,7 @@
 'use strict';
 
+var errors = require('./shared/errors');
+
 /**
  * Install the update - this function is returned in the resolved promise of _download
  * @param  {Object} updateInfo 	- The info received from the server
@@ -17,7 +19,7 @@ module.exports = function (updateInfo, options) {
 		var ccsConfig = state.get('ccs');
 
 		if (state.get('isInstalling')) {
-			reject('cordova-code-swap: An installation is already in progress');
+			reject(errors.create(errors.INSTALL_IN_PROGRESS));
 		} else {
 			state.set('isInstalling', true);
 		}
@@ -48,7 +50,7 @@ module.exports = function (updateInfo, options) {
 				resolve(initialize(instanceOptions));
 			}
 		}).catch(function (err) {
-			return reject(err);
+			return reject(errors.create(errors.INSTALL_GENERAL, '', err));
 		});
 	});
 };

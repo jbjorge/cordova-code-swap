@@ -2,6 +2,8 @@
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var errors = require('./shared/errors');
+
 /**
  * Get the update - this function is returned in the resolved promise of lookForUpdates
  * @param  {Object} updateInfo	- The info received from the server
@@ -21,7 +23,7 @@ module.exports = function (updateInfo, options, progressCallback) {
 		var install = require('./install');
 
 		if (state.get('isDownloading')) {
-			reject(new Error('cordova-code-swap: A download is already in progress.'));
+			reject(errors.create(errors.DOWNLOAD_IN_PROGRESS));
 		}
 
 		// make a local copy of updateInfo so it can be mutated
@@ -48,7 +50,7 @@ module.exports = function (updateInfo, options, progressCallback) {
 			ccsConfig.pendingInstallation = false;
 			state.set('isDownloading', false);
 			localStorage.ccs = JSON.stringify(ccsConfig);
-			reject(err);
+			reject(errors.create(errors.DOWNLOAD_GENERAL, '', err));
 		});
 	});
 };

@@ -2,6 +2,8 @@
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var errors = require('./shared/errors');
+
 /**
  * PUBLIC
  * Looks for updates on the server
@@ -23,15 +25,15 @@ module.exports = function (url) {
 		var download = require('./download');
 
 		if (!url) {
-			reject(new Error('cordova-code-swap: No url was supplied when using .lookForUpdates'));
+			reject(errors.create(errors.NO_URL));
 		}
 
 		if (!state.get('initialized')) {
-			reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
+			reject(errors.create(errors.NOT_INITIALIZED));
 		}
 
 		if (state.get('isLookingForUpdates')) {
-			reject(new Error('cordova-code-swap: .lookForUpdates is already running.'));
+			reject(errors.create(errors.LOOKFORUPDATES_IN_PROGRESS));
 		}
 
 		options = _extends({}, defaultOptions.update, options);
@@ -53,7 +55,7 @@ module.exports = function (url) {
 			resolve(downloadFunction);
 		}).catch(function (err) {
 			state.set('isLookingForUpdates', false);
-			reject(err);
+			reject(errors.create(errors.LOOKFORUPDATES_GENERAL, '', err));
 		});
 	});
 };

@@ -3,6 +3,7 @@
 var getFileSystem = require('../shared/getFileSystem');
 var getFolder = require('../shared/getFolder');
 var Promise = require('bluebird');
+var errors = require('../shared/errors');
 
 /**
  * Copy folder to folder
@@ -30,7 +31,7 @@ function copy(fromFolder, toFolder) {
 			if (err.code == 9) {
 				resolve();
 			} else {
-				reject(new Error('cordova-code-swap: ' + JSON.stringify(err)));
+				reject(errors.create(errors.FOLDER_COPY, JSON.stringify(err)));
 			}
 		});
 	});

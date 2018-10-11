@@ -1,6 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
+var errors = require('./errors');
 
 /**
  * Gets instance of the cordova file system
@@ -10,7 +11,7 @@ var Promise = require('bluebird');
 function getFileSystem(folder) {
 	return new Promise(function (resolve, reject) {
 		window.resolveLocalFileSystemURL(folder, resolve, function (err) {
-			return reject(new Error('cordova-code-swap: Error when getting file system at path ' + folder + ' Error: ' + JSON.stringify(err)));
+			return reject(errors.create(errors.GET_FILE_SYSTEM, 'Error when getting file system at path ' + folder + ' Error: ' + JSON.stringify(err)));
 		});
 	});
 }

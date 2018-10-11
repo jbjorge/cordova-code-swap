@@ -2,6 +2,7 @@
 
 var createFoldersInPath = require('./createFoldersInPath');
 var urlJoin = require('url-join');
+var errors = require('../shared/errors');
 
 /**
  * Downloads files
@@ -32,7 +33,7 @@ function downloadFile(contentUrl, fileToDownload, destinationFolderName, options
 				doneCallback(fileToDownload);
 				resolve(args);
 			}, function (error) {
-				return reject(new Error('cordova-code-swap: ' + JSON.stringify(error)));
+				return reject(errors.create(errors.FILE_DOWNLOAD, JSON.stringify(error)));
 			}, shouldTrustAllHosts, options);
 		});
 	});
