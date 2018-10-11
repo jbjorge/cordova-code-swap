@@ -1,4 +1,5 @@
 const sanitizeFolder = require('filenamify');
+const packageJson = require('../../package.json');
 
 function updateCCSConfig(ccs, updateInfo, options, instanceOptions) {
 	let ccsCopy = Object.assign({}, ccs);
@@ -9,7 +10,8 @@ function updateCCSConfig(ccs, updateInfo, options, instanceOptions) {
 			release: ccsCopy.release,
 			manifest: ccsCopy.manifest,
 			timestamp: ccsCopy.timestamp,
-			entryPoint: ccsCopy.entryPoint
+			entryPoint: ccsCopy.entryPoint,
+			ccsVersion: ccsCopy.ccsVersion
 		});
 	} else {
 		ccsCopy.backups = [];
@@ -19,6 +21,7 @@ function updateCCSConfig(ccs, updateInfo, options, instanceOptions) {
 	ccsCopy.manifest = updateInfo.manifest;
 	ccsCopy.timestamp = Date.now();
 	ccsCopy.entryPoint = sanitizeFolder(ccsCopy.release) + '/' + options.entryFile;
+	ccsCopy.ccsVersion = packageJson.version;
 
 	return ccsCopy;
 }
