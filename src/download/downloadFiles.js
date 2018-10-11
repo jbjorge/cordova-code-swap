@@ -1,5 +1,6 @@
 const createFoldersInPath = require('./createFoldersInPath');
 const urlJoin = require('url-join');
+const errors = require('../shared/errors');
 
 /**
  * Downloads files
@@ -34,7 +35,7 @@ function downloadFile(contentUrl, fileToDownload, destinationFolderName, options
 						doneCallback(fileToDownload);
 						resolve(args);
 					},
-					error => reject(new Error('cordova-code-swap: ' + JSON.stringify(error))),
+					error => reject(errors.create(errors.FILE_DOWNLOAD, JSON.stringify(error))),
 					shouldTrustAllHosts,
 					options
 				);

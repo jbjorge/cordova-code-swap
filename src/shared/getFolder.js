@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const errors = require('./errors');
 
 /**
  * Get folder from the cordova file system
@@ -13,7 +14,7 @@ function getFolder(fs, path, options) {
 			path,
 			options,
 			resolve,
-			err => reject(new Error('cordova-code-swap: Error when getting folder at path ' + path + ' Error: ' + JSON.stringify(err)))
+			err => reject(errors.create(errors.GET_FOLDER, 'Error when getting folder at path ' + path + ' Error: ' + JSON.stringify(err)))
 		);
 	});
 }

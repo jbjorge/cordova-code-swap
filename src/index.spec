@@ -7,6 +7,7 @@ mock('./initialize', () => {
 	return 'initializing';
 });
 const sut = require('./index');
+const errors = require('./shared/errors');
 
 context('public functions', () => {
 	it('should expose lookForUpdates', () => {
@@ -37,7 +38,7 @@ context('install', () => {
 				}
 			}
 		});
-		const expectedErrorMessage = 'cordova-code-swap: .initialize() needs to be run before installing. It should be the first thing to be run in the application.';
+		const expectedErrorMessage = `cordova-code-swap: ${errors.NOT_INITIALIZED.message}`;
 		return sut.install()
 			.catch(err => {
 				assert(err instanceof Error);
@@ -78,13 +79,14 @@ context('install', () => {
 				}
 			}
 		});
+		const expectedErrorMessage = `cordova-code-swap: ${errors.NO_PENDING_INSTALL.message}`;
 		return sut.install()
 			.then(() => {
 				throw new Error('Test failed.');
 			})
 			.catch(err => {
 				assert(err instanceof Error);
-				assert.equal(err.message, 'cordova-code-swap: Tried to install update, but no updates have been previously downloaded.');
+				assert.equal(err.message, expectedErrorMessage);
 			});
 	});
 });

@@ -1,3 +1,5 @@
+const errors = require('./shared/errors');
+
 /**
  * Get the update - this function is returned in the resolved promise of lookForUpdates
  * @param  {Object} updateInfo	- The info received from the server
@@ -17,7 +19,7 @@ module.exports = function(updateInfo, options, progressCallback) {
 		const install = require('./install');
 
 		if (state.get('isDownloading')) {
-			reject(new Error('cordova-code-swap: A download is already in progress.'));
+			reject(errors.create(errors.DOWNLOAD_IN_PROGRESS));
 		}
 
 		// make a local copy of updateInfo so it can be mutated
@@ -47,7 +49,7 @@ module.exports = function(updateInfo, options, progressCallback) {
 				ccsConfig.pendingInstallation = false;
 				state.set('isDownloading', false);
 				localStorage.ccs = JSON.stringify(ccsConfig);
-				reject(err);
+				reject(errors.create(errors.DOWNLOAD_GENERAL, '', err));
 			});
 	});
 };

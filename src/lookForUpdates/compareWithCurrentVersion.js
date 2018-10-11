@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const errors = require('../shared/errors');
 
 /**
  * Compares the current version with the version received from the server
@@ -15,13 +16,13 @@ function compareWithCurrentVersion(ccs, updateInfo) {
 
 function throwIfCurrentVersionIsNewest(ccs, updateInfo) {
 	if (updateInfo.release === ccs.release) {
-		throw new Error('cordova-code-swap: Current installed version is the same as the version on the update server.');
+		throw errors.create(errors.NO_UPDATE_AVAILABLE);
 	}
 }
 
 function throwIfPendingInstallVersionIsSame(ccs, updateInfo) {
 	if (ccs.pendingInstallation && ccs.pendingInstallation.updateInfo && ccs.pendingInstallation.updateInfo.release === updateInfo.release) {
-		throw new Error('cordova-code-swap: Newest version is already downloaded, but not installed. Use .install() to install it.');
+		throw errors.create(errors.PENDING_INSTALL);
 	}
 }
 

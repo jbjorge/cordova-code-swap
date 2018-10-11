@@ -4,6 +4,7 @@ const getFile = require('./getFile');
 const Promise = require('bluebird');
 const createFoldersInPath = require('./createFoldersInPath');
 const urlJoin = require('url-join');
+const errors = require('../shared/errors');
 
 /**
  * Copies files between locations
@@ -14,16 +15,6 @@ const urlJoin = require('url-join');
  * @return {Promise}
  */
 function copyFiles(fromRootFolder, files, toRootFolder, toFolder) {
-	// return Promise.join(
-	// 	getFileEntries(fromRootFolder, files),
-	// 	getFolderEntry(toRootFolder, toFolder),
-	// 	(fileEntries, toFolderEntry) => {
-	// 		const copyPromises = [];
-	// 		fileEntries.forEach(fileEntry => {
-	// 			copyPromises.push(copyFile(fileEntry, toFolderEntry));
-	// 		});
-	// 		return Promise.all(copyPromises);
-	// 	});
 	return Promise.join(
 		getFileSystem(fromRootFolder),
 		getFolderEntry(toRootFolder, toFolder),
@@ -41,14 +32,6 @@ function getFolderEntry(rootFolder, subFolder) {
 		.then(fs => getFolder(fs, subFolder, { create: true }));
 }
 
-// function getFileEntries(fromRootFolder, files) {
-// 	return getFileSystem(fromRootFolder)
-// 		.then(fs => {
-// 			const filePromises = files.map(file => getFile(fs, file, { create: false }));
-// 			return Promise.all(filePromises);
-// 		});
-// }
-
 function copyFile(fromFolderEntry, file, toFolderEntry) {
 	const fullPath = urlJoin(toFolderEntry.fullPath, file);
 	return Promise.join(
@@ -60,25 +43,10 @@ function copyFile(fromFolderEntry, file, toFolderEntry) {
 					destinationEntry,
 					'',
 					() => resolve(),
-					err => reject(new Error('cordova-code-swap: ' + JSON.stringify(err)))
+					err => reject(errors.create(errors.FILE_COPY, JSON.stringify(err)))
 				);
 			});
 		});
 }
-
-// function copyFile(fileEntry, toFolderEntry) {
-// 	const fullPath = urlJoin(toFolderEntry.fullPath, fileEntry.fullPath);
-// 	return createFoldersInPath(fullPath, { endsInFile: true })
-// 		.then(destinationEntry => {
-// 			return new Promise((resolve, reject) => {
-// 				fileEntry.copyTo(
-// 					destinationEntry,
-// 					'',
-// 					() => resolve(),
-// 					err => reject(new Error('cordova-code-swap: ' + JSON.stringify(err)))
-// 				);
-// 			});
-// 		});
-// }
 
 module.exports = copyFiles;

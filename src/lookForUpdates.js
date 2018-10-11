@@ -1,3 +1,5 @@
+const errors = require('./shared/errors');
+
 /**
  * PUBLIC
  * Looks for updates on the server
@@ -17,15 +19,15 @@ module.exports = function(url, options = {}) {
 		const download = require('./download');
 
 		if (!url) {
-			reject(new Error('cordova-code-swap: No url was supplied when using .lookForUpdates'));
+			reject(errors.create(errors.NO_URL));
 		}
 
 		if (!state.get('initialized')) {
-			reject(new Error('cordova-code-swap: .initialize() needs to be run before looking for updates. It should be the first thing to be run in the application.'));
+			reject(errors.create(errors.NOT_INITIALIZED));
 		}
 
 		if (state.get('isLookingForUpdates')) {
-			reject(new Error('cordova-code-swap: .lookForUpdates is already running.'));
+			reject(errors.create(errors.LOOKFORUPDATES_IN_PROGRESS));
 		}
 
 		options = Object.assign({}, defaultOptions.update, options);
@@ -50,7 +52,7 @@ module.exports = function(url, options = {}) {
 			})
 			.catch(err => {
 				state.set('isLookingForUpdates', false);
-				reject(err);
+				reject(errors.create(errors.LOOKFORUPDATES_GENERAL, '', err));
 			});
 	});
 };

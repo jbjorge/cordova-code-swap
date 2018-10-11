@@ -1,3 +1,4 @@
+const errors = require('../shared/errors');
 const Promise = require('bluebird');
 
 /**
@@ -13,7 +14,7 @@ function getFile(fs, path, options) {
 			path,
 			options,
 			resolve,
-			err => reject(new Error('cordova-code-swap: Error when getting file at path ' + path + ' Error: ' + JSON.stringify(err)))
+			err => reject(errors.create(errors.GET_FILE, 'Error when getting file at path ' + path + ' Error: ' + JSON.stringify(err)))
 		);
 	});
 }

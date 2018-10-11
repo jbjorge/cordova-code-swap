@@ -1,4 +1,5 @@
 const getConfig = require('./getConfig');
+const errors = require('./errors');
 const state = {
 	initialized: false,
 	ccs: getConfig(),
@@ -10,7 +11,7 @@ const state = {
 
 exports.set = (name, value) => {
 	if (!state.hasOwnProperty(name)) {
-		throw new Error('Tried assigning value to undeclared property');
+		throw errors.create(errors.CCS_INTERNAL, 'Tried assigning value to undeclared property');
 	}
 	state[name] = value;
 	return state[name];
