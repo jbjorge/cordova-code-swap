@@ -52,7 +52,7 @@ module.exports = function(url, options = {}) {
 			})
 			.catch(err => {
 				state.set('isLookingForUpdates', false);
-				reject(errors.create(errors.LOOKFORUPDATES_GENERAL, '', err));
+				reject(errors.create(errors.LOOKFORUPDATES_GENERAL, null, err));
 			});
 	});
 };

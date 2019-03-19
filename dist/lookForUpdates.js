@@ -55,7 +55,7 @@ module.exports = function (url) {
 			resolve(downloadFunction);
 		}).catch(function (err) {
 			state.set('isLookingForUpdates', false);
-			reject(errors.create(errors.LOOKFORUPDATES_GENERAL, '', err));
+			reject(errors.create(errors.LOOKFORUPDATES_GENERAL, null, err));
 		});
 	});
 };

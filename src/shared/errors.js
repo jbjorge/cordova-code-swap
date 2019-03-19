@@ -46,7 +46,7 @@ module.exports = Object.freeze(Object.assign(
 			const resolvedErr = resolveType(type);
 			const errMessage = 'cordova-code-swap: ' + (message || resolvedErr.message);
 			const err = originalErr || (new Error(errMessage));
-			err.code = resolvedErr.code;
+			err.code = err.code || resolvedErr.code;
 			return err;
 		}
 	}
