@@ -27,10 +27,13 @@ module.exports = function(updateInfo, options) {
 
 		// find obsolete backups
 		let sortedBackups = sort.descending(ccsConfig.backups, 'timestamp');
-		let backupsToDelete = sortedBackups.slice(instanceOptions.backupCount, sortedBackups.length);
+		let backupsToDelete = sortedBackups
+			.slice(instanceOptions.backupCount, sortedBackups.length)
+			.filter(backup => backup.release !== ccsConfig.release);
 
 		// update the current the backup list
-		ccsConfig.backups = sortedBackups.slice(0, instanceOptions.backupCount);
+		ccsConfig.backups = sortedBackups.slice(0, instanceOptions.backupCount)
+			.filter(backup => backup.release !== ccsConfig.release);
 
 		Promise.resolve()
 			.then(() => instanceOptions.debug.preserveBreakpoints ? null : deleteBackups(backupsToDelete))
